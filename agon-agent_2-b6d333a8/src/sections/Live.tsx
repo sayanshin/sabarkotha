@@ -1,22 +1,24 @@
 import { useEffect, useState } from 'react';
-import { Radio, Play, ExternalLink } from 'lucide-react';
+import { Radio, Play, Plus } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
+import { useAdmin } from '../context/AdminContext';
 import { api, type NewsItem, type UpdateVideo } from '../lib/api';
 import { ytThumb, youtubeId } from '../lib/youtube';
 
 interface LiveProps {
   onPlay?: (video: UpdateVideo) => void;
+  onManage?: () => void;
 }
 
-export default function Live({ onPlay }: LiveProps) {
+export default function Live({ onPlay, onManage }: LiveProps) {
   const [liveItem, setLiveItem] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useAdmin();
 
   useEffect(() => {
     async function loadLive() {
       try {
         const data = await api.getNews();
-        // Find the latest row that has a live_url
         const found = (data || []).find((item) => item.live_url);
         setLiveItem(found || null);
       } catch (err) {
@@ -69,15 +71,27 @@ export default function Live({ onPlay }: LiveProps) {
               প্রতিদিন ভোরের সংবাদ সকাল ৭টায়, প্রধান সংবাদ সন্ধ্যা ৬টায়। লাইভ শুরু হলেই এই পাতায় সরাসরি দেখা যাবে।
             </p>
 
-            {isOnline && (
-              <button
-                onClick={handlePlay}
-                className="inline-flex items-center gap-2 rounded-xl bg-paper-soft px-6 py-3 font-bold text-alta-red shadow-lg transition-transform hover:scale-105"
-              >
-                <Play className="h-5 w-5 fill-alta-red" />
-                লাইভ সম্প্রচার দেখুন
-              </button>
-            )}
+            <div className="flex flex-wrap items-center gap-4">
+              {isOnline && (
+                <button
+                  onClick={handlePlay}
+                  className="inline-flex items-center gap-2 rounded-xl bg-paper-soft px-6 py-3 font-bold text-alta-red shadow-lg transition-transform hover:scale-105"
+                >
+                  <Play className="h-5 w-5 fill-alta-red" />
+                  লাইভ সম্প্রচার দেখুন
+                </button>
+              )}
+
+              {isAdmin && onManage && (
+                <button
+                  onClick={onManage}
+                  className="inline-flex items-center gap-2 rounded-xl border-2 border-paper-soft/40 bg-paper-soft/10 px-5 py-3 font-bold text-paper-soft hover:bg-paper-soft/20"
+                >
+                  <Plus className="h-5 w-5" />
+                  লাইভ নিয়ন্ত্রণ করুন
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="lg:col-span-7">
@@ -88,12 +102,18 @@ export default function Live({ onPlay }: LiveProps) {
               }`}
             >
               {thumb ? (
-                <img src={thumb} alt="Live Stream" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <img
+                  src={thumb}
+                  alt="Live Stream"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center p-8 text-center">
                   <Radio className="h-16 w-16 text-paper-soft/40" />
                   <h4 className="mt-4 font-editorial text-2xl font-bold text-paper-soft">পরবর্তী লাইভ সিডিউল শীঘ্রই</h4>
-                  <p className="mt-2 text-sm text-paper-soft/60">The broadcast room is quiet — the dhak will sound again soon.</p>
+                  <p className="mt-2 text-sm text-paper-soft/60">
+                    The broadcast room is quiet — the dhak will sound again soon.
+                  </p>
                 </div>
               )}
 
