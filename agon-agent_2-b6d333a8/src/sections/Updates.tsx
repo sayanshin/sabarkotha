@@ -3,19 +3,8 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ExternalLink, Play, Plus, Youtube } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import { useAdmin } from '../context/AdminContext';
-import { api, type UpdateVideo } from '../lib/api';
+import { api, type NewsItem, type UpdateVideo } from '../lib/api';
 import { ytThumb, youtubeId } from '../lib/youtube';
-
-interface LocalNewsItem {
-  id: string;
-  dscription?: string;
-  news_url?: string;
-  live_url?: string;
-  story_url?: string;
-  channel_url?: string;
-  thumbnail_url?: string;
-  created_at?: string;
-}
 
 interface UpdatesProps {
   onPlay: (video: UpdateVideo) => void;
@@ -27,7 +16,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
 
-  const [news, setNews] = useState<LocalNewsItem[]>([]);
+  const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useAdmin();
 
@@ -35,9 +24,9 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
     async function loadNews() {
       try {
         const data = await api.getNews();
-        setNews(data || []);
+        setNews(data);
       } catch (err) {
-        console.error('Error loading Supabase news:', err);
+        console.error('Error loading news:', err);
       } finally {
         setLoading(false);
       }
@@ -88,7 +77,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
               const handleItemClick = () => {
                 if (youtubeId(activeUrl)) {
                   onPlay({
-                    id: item.id,
+                    id: String(item.id),
                     title: item.dscription || 'সবার কথা আপডেট',
                     youtube_url: activeUrl,
                     category: 'সংবাদ',
@@ -155,7 +144,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
           {!loading && news.length === 0 && (
             <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
-              এখনও কোনো ভিডিও যোগ হয়নি — সরাসরি Supabase থেকে ডেটা আসবে।
+              এখনও কোনো খবর আপডেট যোগ হয়নি — সরাসরি Supabase থেকে ডেটা আসছে।
             </p>
           )}
 
@@ -165,11 +154,14 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
               className="group flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-[18px] border-[3px] border-dashed border-sindoor/45 bg-sindoor/5 text-sindoor transition-colors hover:bg-sindoor/10"
             >
               <Plus className="h-9 w-9 transition-transform group-hover:rotate-90" />
-              <span className="font-bangla text-base font-bold">নতুন ইউটিউব ভিডিও যোগ করুন</span>
-              <span className="text-xs opacity-70">সম্পাদকের ডেস্ক খুলবে</span>
+              <span className="font-bangla text-base font-bold">নতুন খবর যোগ করুন</span>
             </button>
           )}
         </div>
+      </div>
+    </section>
+  );
+}
       </div>
     </section>
   );
