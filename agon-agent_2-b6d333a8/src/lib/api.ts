@@ -1,3 +1,16 @@
+import supabase from './supabase';
+
+export interface NewsItem {
+  id: number;
+  created_at?: string;
+  news_url?: string;
+  live_url?: string;
+  story_url?: string;
+  channel_url?: string;
+  thumbnail_url?: string;
+  dscription?: string;
+}
+
 export interface UpdateVideo {
   id: number;
   title: string;
@@ -106,6 +119,19 @@ type EpisodePayload = Partial<StoryEpisode>;
 type LinkPayload = Partial<SiteLink>;
 
 export const api = {
+  // Direct Supabase news fetcher
+  getNews: async (): Promise<NewsItem[]> => {
+    const { data, error } = await supabase
+      .from('news')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching news:', error);
+      return [];
+    }
+    return data as NewsItem[];
+  },
   updates: {
     list: () => req<UpdateVideo[]>('/api/updates'),
     create: (d: VideoPayload) => req<UpdateVideo>('/api/updates', { method: 'POST', body: JSON.stringify(d) }, true),
