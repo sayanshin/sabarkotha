@@ -19,17 +19,17 @@ function linkIcon(url: string, kind: string): ReactNode {
 
 const BRAND_MARKS = [
   {
-    src: '/assets/asset3.png',
+    src: '/asset3.png',
     title: 'অফিসিয়াল লোগো',
     caption: 'SK News — সবার কথা · ব্র্যান্ড মার্ক',
   },
   {
-    src: '/assets/asset5.png',
+    src: '/asset5.png',
     title: 'আলপনা ক্রেস্ট',
     caption: 'সবার কথা সিল — সোনালি আলপনা প্রতীক',
   },
   {
-    src: '/assets/06-Story-Haunted-Village.png',
+    src: '/06-Story-Haunted-Village.png',
     title: 'গল্পকথন আর্ট',
     caption: 'মধ্যরাতের রহস্য — কালি-কাগজের চ্যানেল শিল্প',
   },
@@ -39,13 +39,14 @@ export default function About() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
-  const { 
-  id: 'yt-channel',
-  label: 'Sabar Kotha TV',
-  url: 'https://www.youtube.com/@sabarkotha75',
-  kind: 'social'
-  
- } = useData();
+  const { links: fetchedLinks } = useData() || {};
+  const youtubeLink = {
+    id: 'yt-channel',
+    label: 'Sabar Kotha TV',
+    url: 'https://www.youtube.com/@sabarkotha75',
+    kind: 'social'
+  };
+  const links = [youtubeLink, ...(fetchedLinks || [])];
 
   const year = toBanglaDigits(new Date().getFullYear());
 
