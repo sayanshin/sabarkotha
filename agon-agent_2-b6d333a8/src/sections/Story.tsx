@@ -14,7 +14,7 @@ interface StoryProps {
 export default function Story({ onPlay, onManage }: StoryProps) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
 
   const [stories, setStories] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,19 +37,19 @@ export default function Story({ onPlay, onManage }: StoryProps) {
 
   return (
     <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden bg-ink py-24 text-paper-soft">
-      {/* Background Image Layer */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none opacity-40">
+      {/* Background Haunted Village Illustration */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none z-0">
         <img
-          src="/assets/asset2.png"
-          alt=""
+          src="/assets/06-Story-Haunted-Village.png"
+          alt="Haunted Village Background"
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover object-center"
+          className="h-full w-full object-cover object-center opacity-45 mix-blend-luminosity"
         />
-        {/* Soft Vignette Overlay */}
-        <div className="absolute inset-0 bg-radial-vignette" />
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-ink to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink to-transparent" />
+        {/* Gradients to cleanly blend edges with the site theme */}
+        <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-ink via-ink/80 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-ink via-ink/80 to-transparent" />
+        <div className="absolute inset-0 bg-ink/30" />
       </motion.div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4">
@@ -93,7 +93,7 @@ export default function Story({ onPlay, onManage }: StoryProps) {
                 <div
                   key={item.id}
                   onClick={handleItemClick}
-                  className="group relative cursor-pointer overflow-hidden rounded-2xl border border-paper-soft/15 bg-paper/10 backdrop-blur-md p-4 transition-all hover:border-sindoor/60 hover:bg-paper/20 shadow-xl"
+                  className="group relative cursor-pointer overflow-hidden rounded-2xl border border-paper-soft/15 bg-paper/10 backdrop-blur-md p-4 transition-all hover:border-sindoor/60 hover:bg-paper/20 shadow-2xl"
                 >
                   <div className="relative aspect-video overflow-hidden rounded-xl bg-black/50">
                     {thumb ? (
