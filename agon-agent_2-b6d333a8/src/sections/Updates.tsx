@@ -11,51 +11,22 @@ interface UpdatesProps {
   onManage: () => void;
 }
 
-interface FlattenedNewsCard {
-  id: string;
-  url: string;
-  title: string;
-  typeLabel: string;
-  customThumb: string | null;
-  created_at: string;
-}
-
 export default function Updates({ onPlay, onManage }: UpdatesProps) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
 
-  const [cards, setCards] = useState<FlattenedNewsCard[]>([]);
+  const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useAdmin();
 
   useEffect(() => {
     async function loadNews() {
       try {
-        const data: NewsItem[] = await api.getNews();
-        
-        const list: FlattenedNewsCard[] = [];
-        (data || []).forEach((item) => {
-          // Fallback safely if dscription or thumbnail_url is NULL
-          const desc = item.dscription || 'সবার কথা নতুন আপডেট';
-          const createdAt = item.created_at || '';
-          const customThumb = item.thumbnail_url || null;
-
-          if (item.news_url) {
-            list.push({ id: `${item.id}-news`, url: item.news_url, title: desc, typeLabel: 'সংবাদ', customThumb, created_at: createdAt });
-          }
-          if (item.live_url) {
-            list.push({ id: `${item.id}-live`, url: item.live_url, title: desc, typeLabel: 'লাইভ', customThumb, created_at: createdAt });
-          }
-          if (item.story_url) {
-            list.push({ id: `${item.id}-story`, url: item.story_url, title: desc, typeLabel: 'শর্টস / স্টোরি', customThumb, created_at: createdAt });
-          }
-          if (item.channel_url) {
-            list.push({ id: `${item.id}-channel`, url: item.channel_url, title: desc, typeLabel: 'চ্যানেল', customThumb, created_at: createdAt });
-          }
-        });
-
-        setCards(list);
+        const data = await api.getNews();
+        // Filter only items that have news_url
+        const filtered = (data || []).filter((item) => item.news_url);
+        setNews(filtered);
       } catch (err) {
         console.error('Error loading news:', err);
       } finally {
@@ -101,28 +72,29 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
             ))}
 
           {!loading &&
-            cards.map((card, i) => {
-              const thumb = card.customThumb || ytThumb(card.url);
+            news.map((item, i) => {
+              const url = item.news_url || '';
+              const thumb = item.thumbnail_url || ytThumb(url);
 
               const handleItemClick = () => {
-                if (youtubeId(card.url)) {
+                if (youtubeId(url)) {
                   onPlay({
-                    id: card.id as any,
-                    title: card.title,
-                    youtube_url: card.url,
-                    category: card.typeLabel,
+                    id: (Number(item.id) || item.id) as any,
+                    title: item.dscription || 'সবার কথা আপডেট',
+                    youtube_url: url,
+                    category: 'সংবাদ',
                     featured: false,
                     sort_order: i,
-                    created_at: card.created_at,
+                    created_at: item.created_at || '',
                   });
-                } else {
-                  window.open(card.url, '_blank');
+                } else if (url) {
+                  window.open(url, '_blank');
                 }
               };
 
               return (
                 <motion.article
-                  key={card.id}
+                  key={item.id}
                   initial={{ opacity: 0, y: 34 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-60px' }}
@@ -137,7 +109,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
                       {thumb ? (
                         <img
                           src={thumb}
-                          alt={card.title}
+                          alt={item.dscription || 'News'}
                           loading="lazy"
                           decoding="async"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -150,7 +122,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
                       <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
 
                       <span className="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/40 bg-sindoor/90 text-white shadow-xl transition-transform duration-300 group-hover:scale-110">
-                        {youtubeId(card.url) ? (
+                        {youtubeId(url) ? (
                           <Play className="ml-1 h-7 w-7 fill-white" />
                         ) : (
                           <ExternalLink className="h-7 w-7 stroke-white" />
@@ -159,15 +131,12 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
                     </div>
 
                     <div className="p-4 sm:p-5">
-                      <div className="mb-2 inline-block rounded-full bg-sindoor/10 px-2.5 py-0.5 text-xs font-semibold text-sindoor">
-                        {card.typeLabel}
-                      </div>
                       <h3 className="font-editorial text-lg font-bold leading-snug text-ink transition-colors group-hover:text-sindoor">
-                        {card.title}
+                        {item.dscription || 'সবার কথা নতুন আপডেট'}
                       </h3>
                       <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
                         <Youtube className="h-3.5 w-3.5 text-sindoor" />
-                        {youtubeId(card.url) ? 'ইন-অ্যাপ প্লেয়ারে দেখুন' : 'ইউটিউবে সরাসরি দেখুন'}
+                        {youtubeId(url) ? 'ইন-অ্যাপ প্লেয়ারে দেখুন' : 'ইউটিউবে সরাসরি দেখুন'}
                       </p>
                     </div>
                   </div>
@@ -175,7 +144,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
               );
             })}
 
-          {!loading && cards.length === 0 && (
+          {!loading && news.length === 0 && (
             <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
               এখনও কোনো খবর আপডেট যোগ হয়নি — সরাসরি Supabase থেকে ডেটা আসছে।
             </p>
