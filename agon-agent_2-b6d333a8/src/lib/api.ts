@@ -58,17 +58,45 @@ export interface Playable {
 }
 
 export const tokenStore = {
-  get: (): string => (typeof localStorage !== 'undefined' ? localStorage.getItem('sk_admin_token') || '' : ''),
-  set: (t: string) => localStorage.setItem('sk_admin_token', t),
-  clear: () => localStorage.removeItem('sk_admin_token'),
+  get: (): string => {
+    if (typeof localStorage === 'undefined') return '';
+    return localStorage.getItem('sk_admin_token') || localStorage.getItem('admin_token') || '';
+  },
+  set: (t: string) => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('sk_admin_token', t);
+      localStorage.setItem('admin_token', t);
+    }
+  },
+  clear: () => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('sk_admin_token');
+      localStorage.removeItem('admin_token');
+    }
+  },
 };
 
 async function req<T>(path: string, options: RequestInit = {}, admin = false): Promise<T> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (admin) headers.Authorization = `Bearer ${tokenStore.get()}`;
+  const headers: Record<string, string> = { 
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> || {})
+  };
+  
+  if (admin) {
+    const token = tokenStore.get();
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+  }
+
   const res = await fetch(path, { ...options, headers });
   const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-  if (!res.ok) throw new Error((data.error as string) || `Request failed (${res.status})`);
+  
+  if (!res.ok) {
+    const errorMessage = (data.error as string) || (data.message as string) || `Request failed with status ${res.status}`;
+    throw new Error(errorMessage);
+  }
+  
   return data as T;
 }
 
@@ -112,7 +140,13 @@ export const api = {
       req<JourneyMember>('/api/members', { method: 'POST', body: JSON.stringify(d) }),
   },
   admin: {
-    login: (password: string) => req<{ token: string }>('/api/admin', { method: 'POST', body: JSON.stringify({ password }) }),
+    login: async (password: string) => {
+      const res = await req<{ token: string }>('/api/admin', { method: 'POST', body: JSON.stringify({ password }) });
+      if (res.token) {
+        tokenStore.set(res.token);
+      }
+      return res;
+    },
     verify: () => req<{ valid: boolean }>('/api/admin', {}, true),
   },
 };
