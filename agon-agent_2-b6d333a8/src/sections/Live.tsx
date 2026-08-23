@@ -4,7 +4,6 @@ import SectionHeading from '../components/SectionHeading';
 import { useAdmin } from '../context/AdminContext';
 import { api, type NewsItem, type UpdateVideo } from '../lib/api';
 import { ytThumb, youtubeId } from '../lib/youtube';
-import bgAsset from '/asset9.png'; // Direct public asset reference
 
 interface LiveProps {
   onPlay?: (video: UpdateVideo) => void;
@@ -56,7 +55,7 @@ export default function Live({ onPlay, onManage }: LiveProps) {
     <section
       id="live"
       className="relative scroll-mt-24 py-24 text-paper-soft bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${bgAsset})` }}
+      style={{ backgroundImage: "url('/asset9.png')" }}
     >
       <div className="mx-auto max-w-6xl px-4 relative z-10">
         <SectionHeading kicker="Live" title="লাইভ সম্প্রচার" sub="সরাসরি যুক্ত থাকুন সবার কথা-র সাথে" />
