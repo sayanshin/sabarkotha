@@ -6,6 +6,9 @@ import { useAdmin } from '../context/AdminContext';
 import { api, type NewsItem, type UpdateVideo } from '../lib/api';
 import { ytThumb, youtubeId } from '../lib/youtube';
 
+// Import image directly to ensure bundler resolves it correctly
+import storyBg from '/1787460890576_1jr14azeq.png';
+
 interface StoryProps {
   onPlay?: (video: UpdateVideo) => void;
   onManage?: () => void;
@@ -40,16 +43,20 @@ export default function Story({ onPlay, onManage }: StoryProps) {
       {/* Background Haunted Village Illustration */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none z-0">
         <img
-          src="/assets/06-Story-Haunted-Village.png"
+          src={storyBg}
           alt="Haunted Village Background"
-          loading="lazy"
+          loading="eager"
           decoding="async"
-          className="h-full w-full object-cover object-center opacity-45 mix-blend-luminosity"
+          className="h-full w-full object-cover object-center opacity-40 mix-blend-luminosity"
+          onError={(e) => {
+            // Fallback if imported path differs in public folder
+            (e.target as HTMLImageElement).src = '/1787460890576_1jr14azeq.png';
+          }}
         />
-        {/* Gradients to cleanly blend edges with the site theme */}
+        {/* Subtle dark gradient overlay for text readability */}
         <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-ink via-ink/80 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-ink via-ink/80 to-transparent" />
-        <div className="absolute inset-0 bg-ink/30" />
+        <div className="absolute inset-0 bg-ink/20" />
       </motion.div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4">
