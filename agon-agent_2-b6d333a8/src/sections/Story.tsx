@@ -40,7 +40,7 @@ export default function Story({ onPlay, onManage }: StoryProps) {
       {/* Background Image Layer */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none opacity-40">
         <img
-          src="/assets/asset2.png"
+         src="/06-Story-Haunted-Village.png"
           alt=""
           loading="lazy"
           decoding="async"
