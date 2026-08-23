@@ -52,12 +52,14 @@ export default function Story({ onPlay, onManage }: StoryProps) {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent opacity-80" />
       </motion.div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4">
-        <SectionHeading
-          kicker="Midnight Stories"
-          title="মধ্যরাতের রহস্য"
-          sub="আমাদের গল্পকথন চ্যানেল — টুর্ডি-বাতির আলোয় গা ছমছমে গ্রাম বাংলার রহস্যগল্প, প্রতি রাতে"
-        />
+    <div className="relative z-10 mx-auto max-w-6xl px-4">
+        <div className="mx-auto max-w-2xl rounded-2xl bg-black/60 p-6 text-center backdrop-blur-md border border-white/10 shadow-2xl">
+          <SectionHeading
+            kicker="Midnight Stories"
+            title="মধ্যরাতের রহস্য"
+            sub="আমাদের গল্পকথন চ্যানেল — টুর্ডি-বাতির আলোয় গা ছমছমে গ্রাম বাংলার রহস্যগল্প, প্রতি রাতে"
+          />
+        </div>
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {loading &&
