@@ -24,7 +24,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
     async function loadNews() {
       try {
         const data = await api.getNews();
-        setNews(data);
+        setNews(data || []);
       } catch (err) {
         console.error('Error loading news:', err);
       } finally {
@@ -77,7 +77,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
               const handleItemClick = () => {
                 if (youtubeId(activeUrl)) {
                   onPlay({
-                    id: String(item.id),
+                    id: (Number(item.id) || item.id) as any,
                     title: item.dscription || 'সবার কথা আপডেট',
                     youtube_url: activeUrl,
                     category: 'সংবাদ',
