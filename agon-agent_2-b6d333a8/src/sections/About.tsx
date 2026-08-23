@@ -39,7 +39,13 @@ export default function About() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
-  const { links } = useData();
+  const { 
+  id: 'yt-channel',
+  label: 'Sabar Kotha TV',
+  url: 'https://www.youtube.com/@sabarkotha75',
+  kind: 'social'
+  
+ } = useData();
 
   const year = toBanglaDigits(new Date().getFullYear());
 
