@@ -1,4 +1,75 @@
+import { useEffect, useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ExternalLink, Play, Plus, Youtube } from 'lucide-react';
+import SectionHeading from '../components/SectionHeading';
+import { useAdmin } from '../context/AdminContext';
+import { api, type NewsItem, type UpdateVideo } from '../lib/api';
+import { ytThumb, youtubeId } from '../lib/youtube';
 
+interface UpdatesProps {
+  onPlay: (video: UpdateVideo) => void;
+  onManage: () => void;
+}
+
+export default function Updates({ onPlay, onManage }: UpdatesProps) {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
+
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { isAdmin } = useAdmin();
+
+  useEffect(() => {
+    async function loadNews() {
+      try {
+        const data = await api.getNews();
+        setNews(data);
+      } catch (err) {
+        console.error('Error loading news:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadNews();
+  }, []);
+
+  return (
+    <section id="updates" ref={ref} className="relative scroll-mt-24 overflow-hidden">
+      <motion.div style={{ y: bgY }} className="absolute inset-x-0 top-0 h-[620px]" aria-hidden="true">
+        <img
+          src="/assets/asset1.png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover object-top"
+        />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-paper to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-b from-transparent via-paper/70 to-paper" />
+      </motion.div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-24 pt-24 sm:pt-32">
+        <div className="paper-ribbon">
+          <SectionHeading
+            kicker="Updates"
+            title="আজকের বড় খবর"
+            sub="পুজো মণ্ডপের সিঁদুর থেকে পাড়ার চায়ের দোকান — প্রতিদিনের নির্বাচিত ভিডিও সংবাদ"
+          />
+        </div>
+
+        <div className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+          {loading &&
+            [0, 1, 2].map((i) => (
+              <div key={i} className="paper-card animate-pulse overflow-hidden p-0">
+                <div className="aspect-video bg-ink/10" />
+                <div className="space-y-2 p-4">
+                  <div className="h-4 w-3/4 rounded bg-ink/10" />
+                  <div className="h-3 w-1/3 rounded bg-ink/10" />
+                </div>
+              </div>
+            ))}
+
+          {!loading &&
             news.map((item, i) => {
               const activeUrl = item.news_url || item.live_url || item.story_url || item.channel_url || '';
               const thumb = item.thumbnail_url || ytThumb(activeUrl);
@@ -87,10 +158,6 @@
             </button>
           )}
         </div>
-      </div>
-    </section>
-  );
-}
       </div>
     </section>
   );
