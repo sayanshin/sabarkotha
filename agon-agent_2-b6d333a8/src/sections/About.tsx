@@ -29,7 +29,7 @@ const BRAND_MARKS = [
     caption: 'সবার কথা সিল — সোনালি আলপনা প্রতীক',
   },
   {
-    src: '/assets/asset7.png',
+    src: '/assets/06-Story-Haunted-Village.png',
     title: 'গল্পকথন আর্ট',
     caption: 'মধ্যরাতের রহস্য — কালি-কাগজের চ্যানেল শিল্প',
   },
