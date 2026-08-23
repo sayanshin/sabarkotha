@@ -15,3 +15,7 @@ if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KE
     'Using the hardcoded fallback key instead. Check your Vercel environment variables.'
   );
 }
+ 
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+ 
+export default supabase;
