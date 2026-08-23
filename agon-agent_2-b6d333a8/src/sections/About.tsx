@@ -19,12 +19,12 @@ function linkIcon(url: string, kind: string): ReactNode {
 
 const BRAND_MARKS = [
   {
-    src: '/asset3.png',
+    src: '/assets/asset3.png',
     title: 'অফিসিয়াল লোগো',
     caption: 'SK News — সবার কথা · ব্র্যান্ড মার্ক',
   },
   {
-    src: '/asset5.png',
+    src: '/assets/asset5.png',
     title: 'আলপনা ক্রেস্ট',
     caption: 'সবার কথা সিল — সোনালি আলপনা প্রতীক',
   },
