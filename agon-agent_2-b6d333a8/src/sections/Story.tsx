@@ -36,20 +36,20 @@ export default function Story({ onPlay, onManage }: StoryProps) {
   }, []);
 
   return (
-    <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden bg-ink py-24 text-paper-soft">
-      {/* Background Image Layer */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none opacity-40">
+   <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden bg-black py-24 text-paper-soft">
+      {/* Background Image Layer - Full Opacity & Pure B&W */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none opacity-100">
         <img
-         src="/06-Story-Haunted-Village.png"
-          alt=""
+          src="/06-Story-Haunted-Village.png"
+          alt="Haunted Village Background"
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover object-center"
+          className="h-full w-full object-cover object-center grayscale brightness-90 contrast-110"
         />
         {/* Soft Vignette Overlay */}
-        <div className="absolute inset-0 bg-radial-vignette" />
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-ink to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink to-transparent" />
+        <div className="absolute inset-0 bg-radial-vignette opacity-50" />
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent opacity-80" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent opacity-80" />
       </motion.div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4">
