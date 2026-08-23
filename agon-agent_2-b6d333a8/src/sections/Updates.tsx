@@ -3,8 +3,19 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ExternalLink, Play, Plus, Youtube } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import { useAdmin } from '../context/AdminContext';
-import { api, type NewsItem, type UpdateVideo } from '../lib/api';
+import { api, type UpdateVideo } from '../lib/api';
 import { ytThumb, youtubeId } from '../lib/youtube';
+
+interface LocalNewsItem {
+  id: string;
+  dscription?: string;
+  news_url?: string;
+  live_url?: string;
+  story_url?: string;
+  channel_url?: string;
+  thumbnail_url?: string;
+  created_at?: string;
+}
 
 interface UpdatesProps {
   onPlay: (video: UpdateVideo) => void;
@@ -16,7 +27,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
 
-  const [news, setNews] = useState<NewsItem[]>([]);
+  const [news, setNews] = useState<LocalNewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useAdmin();
 
@@ -24,7 +35,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
     async function loadNews() {
       try {
         const data = await api.getNews();
-        setNews(data);
+        setNews(data || []);
       } catch (err) {
         console.error('Error loading Supabase news:', err);
       } finally {
@@ -159,10 +170,6 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
             </button>
           )}
         </div>
-      </div>
-    </section>
-  );
-}
       </div>
     </section>
   );
