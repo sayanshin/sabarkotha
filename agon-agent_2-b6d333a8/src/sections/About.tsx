@@ -44,7 +44,15 @@ export default function About() {
     id: 'yt-channel',
     label: 'Sabar Kotha TV',
     url: 'https://www.youtube.com/@sabarkotha75',
-    kind: 'social'
+    kind: 'SK News — সবার কথা'
+  };
+  const links = [youtubeLink, ...(fetchedLinks || [])];
+
+  const youtubeLink = {
+    id: 'yt-channel',
+    label: 'মধ্যরাতের রহস্য',
+    url: 'https://www.youtube.com/@Sonali-R75',
+    kind: 'ভৌতিক গল্প, রহস্যময় ঘটনা, অলৌকিক কাহিনি'
   };
   const links = [youtubeLink, ...(fetchedLinks || [])];
 
