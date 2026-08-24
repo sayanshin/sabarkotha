@@ -79,9 +79,9 @@ export default function Live({ onPlay, onManage }: LiveProps) {
               {isOnline && (
                 <button
                   onClick={handlePlay}
-                  className="inline-flex items-center gap-2 rounded-xl bg-paper-soft px-6 py-3 font-bold text-alta-red shadow-lg transition-transform hover:scale-105"
+                 className="inline-flex items-center gap-2 rounded-xl bg-alta-red px-6 py-3 font-bold text-white shadow-lg transition-transform hover:scale-105"
                 >
-                  <Play className="h-5 w-5 fill-alta-red" />
+                 <Play className="h-5 w-5 fill-white text-white" />
                   লাইভ সম্প্রচার দেখুন
                 </button>
               )}
