@@ -29,5 +29,4 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/sayanshin/sabarkotha.git](https://github.com/sayanshin/sabarkotha.git)
-   cd sabarkotha
+   [https://github.com/sayanshin/sabarkotha.git](https://github.com/sayanshin/sabarkotha.git)
