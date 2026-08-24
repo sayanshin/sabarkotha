@@ -40,23 +40,25 @@ export default function About() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
   const { links: fetchedLinks } = useData() || {};
-  const youtubeLink = {
+
+  const youtubeLink1 = {
     id: 'yt-channel',
     label: 'Sabar Kotha TV',
     url: 'https://www.youtube.com/@sabarkotha75',
-    kind: 'SK News — সবার কথা'
+    kind: 'SK News - সবার কথা'
   };
-  const links = [youtubeLink, ...(fetchedLinks || [])];
 
-  const youtubeLink = {
+  const youtubeLink2 = {
     id: 'yt-channel',
     label: 'মধ্যরাতের রহস্য',
     url: 'https://www.youtube.com/@Sonali-R75',
-    kind: 'ভৌতিক গল্প, রহস্যময় ঘটনা, অলৌকিক কাহিনি'
+    kind: 'ভৌতিক গল্প, রহস্যময় ঘটনা, অলৌকিক কাহিনী'
   };
-  const links = [youtubeLink, ...(fetchedLinks || [])];
+
+  const links = [youtubeLink1, youtubeLink2, ...(fetchedLinks || [])];
 
   const year = toBanglaDigits(new Date().getFullYear());
+  // ... rest of your code
 
   return (
     <section id="about" ref={ref} className="relative scroll-mt-24 overflow-hidden">
