@@ -52,13 +52,13 @@ export default function Live({ onPlay, onManage }: LiveProps) {
   };
 
   return (
-    <section
+   <section
       id="live"
       className="relative scroll-mt-24 py-24 text-paper-soft bg-cover bg-center bg-no-repeat"
-     style={{ backgroundImage: "url('/asset9.png')" }}
+      style={{ backgroundImage: "url('/assets/asset9.png')" }}
     >
+      <div className="absolute inset-0 bg-black/60 pointer-events-none" />
       <div className="mx-auto max-w-6xl px-4 relative z-10">
-        <SectionHeading kicker="Live" title="লাইভ সম্প্রচার" sub="সরাসরি যুক্ত থাকুন সবার কথা-র সাথে" />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:items-center">
           <div className="space-y-6 lg:col-span-5">
