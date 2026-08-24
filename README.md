@@ -29,4 +29,4 @@
 
 1. **Clone the repository:**
    ```bash
-   [https://github.com/sayanshin/sabarkotha.git](https://github.com/sayanshin/sabarkotha.git)
+  git clone https://github.com/sayanshin/sabarkotha.git
