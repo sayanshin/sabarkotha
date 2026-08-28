@@ -121,16 +121,26 @@ type LinkPayload = Partial<SiteLink>;
 
 export const api = {
   // Direct Firebase news fetcher (Using Firestore to match application db instance)
-  getNews: async (): Promise<NewsItem[]> => {
+ getNews: async (): Promise<NewsItem[]> => {
   try {
     const newsRef = collection(db, 'news');
     const snapshot = await getDocs(newsRef);
-    if (!snapshot || snapshot.empty) return [];
 
-    return snapshot.docs.map((doc, index) => ({
-      id: index + 1,
-      ...(doc.data() as Omit<NewsItem, 'id'>),
-    }));
+    if (snapshot.empty) return [];
+
+    return snapshot.docs.map((doc, index) => {
+      const data = doc.data();
+      return {
+        id: data.id ?? index + 1, // Fallback to index if no numeric id exists
+        created_at: data.created_at ?? '',
+        news_url: data.news_url ?? '',
+        live_url: data.live_url ?? '',
+        story_url: data.story_url ?? '',
+        channel_url: data.channel_url ?? '',
+        thumbnail_url: data.thumbnail_url ?? '',
+        dscription: data.dscription ?? data.description ?? '',
+      };
+    });
   } catch (error) {
     console.error('Error fetching news:', error);
     return [];
