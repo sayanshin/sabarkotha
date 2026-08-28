@@ -1,4 +1,4 @@
-import { ref, get, set, push } from 'firebase/database';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 
 export interface NewsItem {
@@ -120,17 +120,16 @@ type EpisodePayload = Partial<StoryEpisode>;
 type LinkPayload = Partial<SiteLink>;
 
 export const api = {
-  // Direct Firebase news fetcher (Replaces Supabase)
+  // Direct Firebase news fetcher (Using Firestore to match application db instance)
   getNews: async (): Promise<NewsItem[]> => {
     try {
-      const newsRef = ref(db, 'news');
-      const snapshot = await get(newsRef);
-      if (!snapshot.exists()) return [];
+      const newsRef = collection(db, 'news');
+      const snapshot = await getDocs(newsRef);
+      if (snapshot.empty) return [];
 
-      const data = snapshot.val();
-      return Object.keys(data).map((key, index) => ({
+      return snapshot.docs.map((doc, index) => ({
         id: index + 1,
-        ...data[key],
+        ...(doc.data() as Omit<NewsItem, 'id'>),
       }));
     } catch (error) {
       console.error('Error fetching news:', error);
