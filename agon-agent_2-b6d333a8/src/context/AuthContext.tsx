@@ -1,6 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { User } from '@supabase/supabase-js';
-import supabase from '../lib/supabase';
+import { 
+  type User, 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  updateProfile, 
+  signOut as firebaseSignOut 
+} from 'firebase/auth';
+import { auth } from '../lib/supabase'; // imports initialized Firebase Auth instance
 
 interface AuthContextValue {
   user: User | null;
@@ -25,37 +32,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
       setLoading(false);
     });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-    return () => subscription.unsubscribe();
+
+    return () => unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return error ? error.message : null;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      return null;
+    } catch (err: any) {
+      return err.message || 'Sign in failed';
+    }
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name } },
-    });
-    if (error) return { error: error.message, autoSignedIn: false };
-    return { error: null, autoSignedIn: !!data.session };
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, { displayName: name });
+      }
+      return { error: null, autoSignedIn: true };
+    } catch (err: any) {
+      return { error: err.message || 'Sign up failed', autoSignedIn: false };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await firebaseSignOut(auth);
   };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
 
   return <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>{children}</AuthContext.Provider>;
 }
