@@ -292,7 +292,7 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
 
                       <button
                         type="button"
-                       onClick={() => signInWithGoogle('Sabar Kotha — সবার কথা')}
+                      onClick={() => signInWithGoogle()}
                         className="flex w-full items-center justify-center gap-2.5 rounded-xl border-2 border-ink/20 bg-white/80 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-ink/50"
                       >
                         <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" aria-hidden="true">
