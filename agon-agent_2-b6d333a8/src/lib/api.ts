@@ -122,20 +122,20 @@ type LinkPayload = Partial<SiteLink>;
 export const api = {
   // Direct Firebase news fetcher (Using Firestore to match application db instance)
   getNews: async (): Promise<NewsItem[]> => {
-    try {
-      const newsRef = collection(db, 'news');
-      const snapshot = await getDocs(newsRef);
-      if (snapshot.empty) return [];
+  try {
+    const newsRef = collection(db, 'news');
+    const snapshot = await getDocs(newsRef);
+    if (!snapshot || snapshot.empty) return [];
 
-      return snapshot.docs.map((doc, index) => ({
-        id: index + 1,
-        ...(doc.data() as Omit<NewsItem, 'id'>),
-      }));
-    } catch (error) {
-      console.error('Error fetching news:', error);
-      return [];
-    }
-  },
+    return snapshot.docs.map((doc, index) => ({
+      id: index + 1,
+      ...(doc.data() as Omit<NewsItem, 'id'>),
+    }));
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    return [];
+  }
+},
   updates: {
     list: () => req<UpdateVideo[]>('/api/updates'),
     create: (d: VideoPayload) => req<UpdateVideo>('/api/updates', { method: 'POST', body: JSON.stringify(d) }, true),
