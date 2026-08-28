@@ -1,28 +1,38 @@
-import { createClient } from '@supabase/supabase-js';
-import { triggerRestore } from './db-wake.js';
- 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
- 
-if (!supabaseUrl || !supabaseServiceKey) {
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+
+const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+const privateKey = process.env.FIREBASE_PRIVATE_KEY
+  ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+  : undefined;
+
+if (!projectId) {
   throw new Error(
-    'Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. ' +
-    'Set both in Vercel → Settings → Environment Variables, then redeploy.'
+    'Missing NEXT_PUBLIC_FIREBASE_PROJECT_ID. ' +
+    'Set it in Vercel → Settings → Environment Variables, then redeploy.'
   );
 }
- 
-const supabase = createClient(
-  supabaseUrl,
-  supabaseServiceKey,
-  {
-    global: {
-      fetch: async (url, options) => {
-        const res = await fetch(url, options);
-        if (!res.ok && res.status >= 500) triggerRestore();
-        return res;
-      },
-    },
+
+// Initialize Firebase Admin (prevents re-initialization on hot reloads)
+let app;
+if (!getApps().length) {
+  if (clientEmail && privateKey) {
+    app = initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+    });
+  } else {
+    // Falls back to default initialization if service account keys aren't set
+    app = initializeApp({ projectId });
   }
-);
- 
-export default supabase;
+} else {
+  app = getApps()[0];
+}
+
+const db = getFirestore(app);
+
+export default db;
