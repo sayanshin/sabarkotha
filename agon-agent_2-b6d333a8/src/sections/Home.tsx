@@ -119,7 +119,7 @@ export default function Home({ onJoin }: HomeProps) {
           </motion.button>
           {user && (
             <p className="rounded-full border border-leaf/30 bg-leaf/10 px-4 py-1.5 text-sm font-semibold text-leaf">
-              স্বাগতম, {user.user_metadata?.name || user.email}!
+              স্বাগতম, {user.displayName || user.email}!
             </p>
           )}
           <button
