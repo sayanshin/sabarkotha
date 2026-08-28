@@ -51,8 +51,18 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
         setUserMode('signin');
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, user]);
+
+  // Trap Escape key to close modal safely
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
 
   const handleUserSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -141,19 +151,20 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-            className="paper-card relative w-full max-w-md overflow-hidden p-0"
+            className="paper-card relative w-full max-w-md overflow-hidden p-0 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* alpona cap — decorative only, above the content */}
+            {/* alpona cap — decorative header accent */}
             <div className="pointer-events-none relative h-16 overflow-hidden">
               <img src="/assets/asset4.png" alt="" className="h-full w-full object-cover object-top" />
               <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-paper-soft" />
             </div>
 
             <button
+              type="button"
               onClick={onClose}
-              aria-label="Close"
-              className="absolute right-3 top-16 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 bg-white/80 text-ink/70 hover:text-sindoor"
+              aria-label="Close authentication modal"
+              className="absolute right-3 top-16 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 bg-white/80 text-ink/70 transition-colors hover:bg-white hover:text-sindoor focus:outline-none focus:ring-2 focus:ring-sindoor"
             >
               <X className="h-4.5 w-4.5" />
             </button>
@@ -161,16 +172,22 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
             <div className="px-6 pb-7 pt-2 sm:px-8">
               <div className="text-center">
                 <span className="mx-auto block h-16 w-16 overflow-hidden rounded-2xl border-[3px] border-sindoor/70 shadow-paper">
-                  <img src="/assets/asset3.png" alt="Sabar Kotha official logo" className="h-full w-full object-cover" />
+                  <img src="/assets/asset3.png" alt="Sabar Kotha logo" className="h-full w-full object-cover" />
                 </span>
                 <h3 className="mt-3 font-editorial text-2xl font-bold text-ink">আমাদের যাত্রার অংশ হোন</h3>
                 <p className="mt-1 font-bangla text-sm text-ink-soft">Be a part of the Sabar Kotha journey</p>
               </div>
 
-              {/* Tabs */}
-              <div className="mt-5 grid grid-cols-2 rounded-xl border-2 border-ink/15 bg-paper-deep/60 p-1">
+              {/* Navigation Tabs */}
+              <div className="mt-5 grid grid-cols-2 rounded-xl border-2 border-ink/15 bg-paper-deep/60 p-1" role="tablist">
                 <button
-                  onClick={() => setTab('user')}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === 'user'}
+                  onClick={() => {
+                    setTab('user');
+                    setError('');
+                  }}
                   className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold transition-all ${
                     tab === 'user' ? 'bg-sindoor text-paper-soft shadow' : 'text-ink/60 hover:text-ink'
                   }`}
@@ -178,7 +195,13 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                   <User className="h-4 w-4" /> ব্যবহারকারী
                 </button>
                 <button
-                  onClick={() => setTab('admin')}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === 'admin'}
+                  onClick={() => {
+                    setTab('admin');
+                    setAdminError('');
+                  }}
                   className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold transition-all ${
                     tab === 'admin' ? 'bg-ink text-amber-100 shadow' : 'text-ink/60 hover:text-ink'
                   }`}
@@ -198,6 +221,7 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                           </label>
                           <input
                             id="auth-name"
+                            type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="যেমন: ঋতুপর্ণা চট্টোপাধ্যায়"
@@ -244,7 +268,7 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                             type="button"
                             onClick={() => setShowPw(!showPw)}
                             aria-label={showPw ? 'Hide password' : 'Show password'}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 hover:text-ink"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 transition-colors hover:text-ink"
                           >
                             {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -252,12 +276,12 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                       </div>
 
                       {error && (
-                        <p className="flex items-start gap-2 rounded-lg bg-sindoor/10 px-3 py-2 text-sm text-sindoor">
+                        <p className="flex items-start gap-2 rounded-lg bg-sindoor/10 px-3 py-2 text-sm text-sindoor" role="alert">
                           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {error}
                         </p>
                       )}
                       {notice && (
-                        <p className="flex items-start gap-2 rounded-lg bg-leaf/10 px-3 py-2 text-sm text-leaf">
+                        <p className="flex items-start gap-2 rounded-lg bg-leaf/10 px-3 py-2 text-sm text-leaf" role="status">
                           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> {notice}
                         </p>
                       )}
@@ -308,6 +332,7 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                         <label htmlFor="journey-name" className="mb-1 block text-sm font-semibold text-ink">নাম</label>
                         <input
                           id="journey-name"
+                          type="text"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="আপনার নাম"
@@ -328,7 +353,7 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                           className="field resize-none"
                         />
                       </div>
-                      {error && <p className="rounded-lg bg-sindoor/10 px-3 py-2 text-sm text-sindoor">{error}</p>}
+                      {error && <p className="rounded-lg bg-sindoor/10 px-3 py-2 text-sm text-sindoor" role="alert">{error}</p>}
                       <button type="submit" disabled={busy} className="btn-journey w-full py-3 text-base disabled:opacity-60">
                         {busy ? <Loader2 className="mx-auto h-5 w-5 animate-spin" /> : 'যাত্রায় নাম লেখান ❀'}
                       </button>
@@ -348,8 +373,8 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                         আপনার নাম এখন সবার কথা-র যাত্রী দেয়ালে। প্রতিদিনের খবর, লাইভ আর গল্প — সবার আগে পাবেন।
                       </p>
                       <div className="mt-5 flex gap-3">
-                        <button onClick={() => setUserMode('account')} className="btn-ghost flex-1 py-2.5 text-sm">অ্যাকাউন্ট</button>
-                        <button onClick={onClose} className="btn-journey flex-1 py-2.5 text-sm">পত্রিকা পড়তে শুরু করুন</button>
+                        <button type="button" onClick={() => setUserMode('account')} className="btn-ghost flex-1 py-2.5 text-sm">অ্যাকাউন্ট</button>
+                        <button type="button" onClick={onClose} className="btn-journey flex-1 py-2.5 text-sm">পত্রিকা পড়তে শুরু করুন</button>
                       </div>
                     </div>
                   )}
@@ -361,10 +386,11 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                         <p className="mt-1 truncate font-semibold text-ink">{user.email}</p>
                       </div>
                       <div className="flex gap-3">
-                        <button onClick={() => setUserMode('journey')} className="btn-journey flex-1 py-2.5 text-sm">
+                        <button type="button" onClick={() => setUserMode('journey')} className="btn-journey flex-1 py-2.5 text-sm">
                           যাত্রী দেয়ালে নাম লেখান
                         </button>
                         <button
+                          type="button"
                           onClick={async () => {
                             await signOut();
                             onClose();
@@ -404,14 +430,14 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                         type="button"
                         onClick={() => setShowAdminPw(!showAdminPw)}
                         aria-label={showAdminPw ? 'Hide password' : 'Show password'}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 hover:text-ink"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 transition-colors hover:text-ink"
                       >
                         {showAdminPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
                   {adminError && (
-                    <p className="flex items-start gap-2 rounded-lg bg-sindoor/10 px-3 py-2 text-sm text-sindoor">
+                    <p className="flex items-start gap-2 rounded-lg bg-sindoor/10 px-3 py-2 text-sm text-sindoor" role="alert">
                       <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {adminError}
                     </p>
                   )}
