@@ -6,7 +6,7 @@ import {
   createUserWithEmailAndPassword, 
   updateProfile, 
   signOut as firebaseSignOut 
-} from 'firebase/auth';
+import { auth } from '../lib/firebase';
 import { auth } from '../lib/supabase';
 
 interface AuthContextValue {
