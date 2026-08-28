@@ -1,4 +1,5 @@
-import supabase from './supabase';
+import { ref, get, set, push } from 'firebase/database';
+import { db } from './firebase';
 
 export interface NewsItem {
   id: number;
@@ -58,11 +59,11 @@ export interface SiteLink {
 }
 
 export interface JourneyMember {
-  id: number;
+  id: string | number;
   name: string;
-  email: string;
-  message: string;
-  created_at: string;
+  email?: string;
+  message?: string;
+  created_at?: string;
 }
 
 export interface Playable {
@@ -119,18 +120,22 @@ type EpisodePayload = Partial<StoryEpisode>;
 type LinkPayload = Partial<SiteLink>;
 
 export const api = {
-  // Direct Supabase news fetcher
+  // Direct Firebase news fetcher (Replaces Supabase)
   getNews: async (): Promise<NewsItem[]> => {
-    const { data, error } = await supabase
-      .from('news')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const newsRef = ref(db, 'news');
+      const snapshot = await get(newsRef);
+      if (!snapshot.exists()) return [];
 
-    if (error) {
+      const data = snapshot.val();
+      return Object.keys(data).map((key, index) => ({
+        id: index + 1,
+        ...data[key],
+      }));
+    } catch (error) {
       console.error('Error fetching news:', error);
       return [];
     }
-    return data as NewsItem[];
   },
   updates: {
     list: () => req<UpdateVideo[]>('/api/updates'),
