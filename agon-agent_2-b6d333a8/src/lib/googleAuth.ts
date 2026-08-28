@@ -1,59 +1,35 @@
-import supabase from './supabase';
+import { GoogleAuthProvider, signInWithPopup, signInWithCredential } from 'firebase/auth';
+import { auth } from './firebase';
 
 const isMobile = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-function buildGoogleUrl(appName: string): string | null {
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
-  const redirectUri = import.meta.env.VITE_GOOGLE_AUTH_PROXY as string;
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-  if (!clientId || !redirectUri) return null;
-  const state = btoa(JSON.stringify({ origin: window.location.origin, appName, supabaseUrl, supabaseAnonKey }));
-  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid%20email%20profile&prompt=select_account&state=${encodeURIComponent(state)}`;
-}
-
-export function signInWithGoogle(appName = 'Sabar Kotha') {
-  const url = buildGoogleUrl(appName);
-  if (!url) {
-    console.warn('[google-auth] Missing VITE_GOOGLE_CLIENT_ID or VITE_GOOGLE_AUTH_PROXY');
-    return;
+export async function signInWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    return result.user;
+  } catch (error: any) {
+    console.error('[google-auth] Firebase Google sign in failed:', error.message);
+    return null;
   }
-  window.open(url, 'google-auth', isMobile() ? '' : 'width=500,height=600');
-
-  const handler = async (event: MessageEvent) => {
-    if (event.data?.type === 'google-auth-denied') {
-      window.removeEventListener('message', handler);
-      return;
-    }
-    if (event.data?.type !== 'google-auth-success') return;
-    window.removeEventListener('message', handler);
-    if (event.data.access_token && event.data.refresh_token) {
-      const { error } = await supabase.auth.setSession({
-        access_token: event.data.access_token,
-        refresh_token: event.data.refresh_token,
-      });
-      if (error) console.error('[google-auth] setSession failed:', error.message);
-    } else if (event.data.id_token) {
-      const { error } = await supabase.auth.signInWithIdToken({ provider: 'google', token: event.data.id_token });
-      if (error) console.error('[google-auth] signInWithIdToken failed:', error.message);
-    }
-  };
-  window.addEventListener('message', handler);
 }
 
 export async function handleGoogleRedirect() {
   const params = new URLSearchParams(window.location.search);
   const token = params.get('google_id_token');
   if (!token) return;
+  
   window.history.replaceState({}, '', window.location.pathname);
-  const { error } = await supabase.auth.signInWithIdToken({ provider: 'google', token });
-  if (error) {
-    console.error('[google-auth] signInWithIdToken failed:', error.message);
-    return;
-  }
+  
   try {
-    window.close();
-  } catch {
-    /* noop */
+    const credential = GoogleAuthProvider.credential(token);
+    await signInWithCredential(auth, credential);
+    try {
+      window.close();
+    } catch {
+      /* noop */
+    }
+  } catch (error: any) {
+    console.error('[google-auth] signInWithCredential failed:', error.message);
   }
 }
