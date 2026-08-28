@@ -7,7 +7,7 @@ import {
   updateProfile, 
   signOut as firebaseSignOut 
 } from 'firebase/auth';
-import { auth } from '../lib/supabase'; // imports initialized Firebase Auth instance
+import { auth } from '../lib/supabase';
 
 interface AuthContextValue {
   user: User | null;
@@ -70,11 +70,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export const useAuth = () => useContext(AuthContext);
-
-  return <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => useContext(AuthContext);
