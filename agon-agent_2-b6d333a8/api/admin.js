@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 
 // Server-side only: the admin password is compared against process.env.ADMIN_PASSWORD
-// and NEVER shipped to the frontend. Configure ADMIN_PASSWORD in the Secrets tab.
+// and NEVER shipped to the frontend. Configure ADMIN_PASSWORD in your Vercel Environment Variables.
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'sabar-editor-golden-24';
-const SIGNING_SECRET = (process.env.SUPABASE_SERVICE_ROLE_KEY || 'sk-local-secret') + '|sk-admin';
+const SIGNING_SECRET = (process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'sk-local-secret') + '|sk-admin';
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 12; // 12 hours
 
 function sign(payload) {
