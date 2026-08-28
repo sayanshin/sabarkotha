@@ -1,19 +1,18 @@
-import { createClient } from '@supabase/supabase-js';
- 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
- 
-// If this warning ever shows up in the browser console, it means Vercel's
-// VITE_SUPABASE_ANON_KEY env var was not baked into the build.
-// Fix: check Vercel → Settings → Environment Variables, then redeploy
-// with "Use existing Build Cache" turned OFF.
-if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.warn(
-    '[supabase.ts] VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY was not found in the build. ' +
-    'Using the hardcoded fallback key instead. Check your Vercel environment variables.'
-  );
-}
- 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
- 
-export default supabase;
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export default app;
