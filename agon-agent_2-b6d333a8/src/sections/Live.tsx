@@ -10,7 +10,7 @@ export interface LiveStreamData {
 }
 
 interface LiveProps {
-  onPlay: (video: {
+  onPlay?: (video: {
     id: number;
     title: string;
     youtube_url: string;
@@ -114,7 +114,7 @@ export default function Live({ onPlay }: LiveProps) {
                 : 'প্রতিদিন ভোরের সংবাদ সকাল ৭টায়, প্রধান সংবাদ সন্ধ্যা ৬টায়। লাইভ শুরু হলেই এই পাতায় সরাসরি দেখা যাবে।'}
             </p>
 
-            {stream?.is_live && (
+            {stream?.is_live && onPlay && (
               <button
                 onClick={() =>
                   onPlay({
