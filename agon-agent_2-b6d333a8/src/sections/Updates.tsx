@@ -8,8 +8,12 @@ import { ytThumb, youtubeId } from '../lib/youtube';
 
 interface NewsItem {
   id: number | string;
-  news_url: string;
+  news_url?: string;
+  youtube_url?: string;
+  url?: string;
   dscription?: string;
+  description?: string;
+  title?: string;
   thumbnail_url?: string;
   created_at?: string;
 }
@@ -31,10 +35,15 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
   useEffect(() => {
     async function loadNews() {
       try {
-        // Fetching directly from public/data.json on GitHub
         const res = await fetch('/data.json');
-        const data: NewsItem[] = await res.json();
-        const filtered = (data || []).filter((item) => item.news_url);
+        const json = await res.json();
+        
+        // Handle both Object format {"updates": [...]} and Array format safely
+        const rawList: NewsItem[] = Array.isArray(json) 
+          ? json 
+          : (json.updates || json.news || []);
+
+        const filtered = rawList.filter((item) => item.news_url || item.youtube_url || item.url);
         setNews(filtered);
       } catch (err) {
         console.error('Error loading static JSON news:', err);
@@ -82,14 +91,15 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
           {!loading &&
             news.map((item, i) => {
-              const url = item.news_url || '';
+              const url = item.news_url || item.youtube_url || item.url || '';
+              const titleText = item.dscription || item.description || item.title || 'সবার কথা আপডেট';
               const thumb = item.thumbnail_url || ytThumb(url);
 
               const handleItemClick = () => {
                 if (youtubeId(url)) {
                   onPlay({
                     id: (Number(item.id) || item.id) as any,
-                    title: item.dscription || 'সবার কথা আপডেট',
+                    title: titleText,
                     youtube_url: url,
                     category: 'সংবাদ',
                     featured: false,
@@ -103,7 +113,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
               return (
                 <motion.article
-                  key={item.id}
+                  key={item.id || i}
                   initial={{ opacity: 0, y: 34 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-60px' }}
@@ -118,7 +128,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
                       {thumb ? (
                         <img
                           src={thumb}
-                          alt={item.dscription || 'News'}
+                          alt={titleText}
                           loading="lazy"
                           decoding="async"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -141,7 +151,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
                     <div className="p-4 sm:p-5">
                       <h3 className="font-editorial text-lg font-bold leading-snug text-ink transition-colors group-hover:text-sindoor">
-                        {item.dscription || 'সবার কথা নতুন আপডেট'}
+                        {titleText}
                       </h3>
                       <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
                         <Youtube className="h-3.5 w-3.5 text-sindoor" />
@@ -155,7 +165,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
           {!loading && news.length === 0 && (
             <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
-              এখনও কোনো খবর আপডেট যোগ হয়নি — GitHub-এর data.json ফাইল থেকে ডেটা লোড করার চেষ্টা করা হচ্ছে।
+              এখনও কোনো খবর আপডেট যোগ হয়নি — data.json ফাইলটি চেক করুন।
             </p>
           )}
 
