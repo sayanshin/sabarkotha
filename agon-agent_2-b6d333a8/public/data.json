@@ -1,4 +1,10 @@
-[
+{ 
+  "live": {
+    "isLive": true,
+    "title": "অন্নপূর্ণা যোজনা নিয়ে শুভেন্দু অধিকারী",
+    "youtube_url": "https://www.youtube.com/live/4mzvrQHtH78?si=wHdTx1ko6pv1nXmh"
+  },
+"updates": [
   {
     "id": 1,
     "news_url": "https://youtu.be/OiwW1lbThFw?si=qMLIAWP1OBohjC9m",
@@ -35,4 +41,43 @@
     "dscription": "কুনাল ঘোষের অবস্থা দেখুন আজকের বিধানসভায়! আপনি কি বলবেন?",
     "thumbnail_url": ""
   }
-]
+],
+  "story": [
+    {
+      "id": 1,
+      "title": "ভৌতিক গল্প অবলম্বনে আজকের গল্প বুনো রাজবাড়ি",
+      "youtube_url": "https://youtu.be/DiwqnDhXXQg",
+      "thumbnail_url": ""
+    }
+     {
+      "id": 2,
+      "title": "ভৌতিক গল্প অশরীরী আত্মা",
+      "youtube_url": "https://youtu.be/MQnMwovas2I",
+      "thumbnail_url": ""
+    }
+     {
+      "id": 3,
+      "title": "ভৌতিক গল্প ডিটেক্টিভ অরিন্দম ও শ্মশানের ভূত",
+      "youtube_url": "https://youtu.be/-neEJDALWMA",
+      "thumbnail_url": ""
+    }
+     {
+      "id": 4,
+      "title": "ভৌতিক গল্প অমাবস্যার শেষ ট্রেন",
+      "youtube_url": "https://youtu.be/eUOkc2vOE7o",
+      "thumbnail_url": ""
+    }
+     {
+      "id": 5,
+      "title": "ভৌতিক গল্প পুরোনো বাড়িতে ভুতের আড্ডা",
+      "youtube_url": "https://youtu.be/q9gUkZxODTk",
+      "thumbnail_url": ""
+    }
+     {
+      "id": 6,
+      "title": "ভয়ংকর ভূতুড়ে গল্প",
+      "youtube_url": "https://youtu.be/-6Aniim3nbE",
+      "thumbnail_url": ""
+    }
+  ]
+}
