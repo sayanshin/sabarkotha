@@ -3,20 +3,8 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ExternalLink, Play, Plus, Youtube } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import { useAdmin } from '../context/AdminContext';
-import { type UpdateVideo } from '../lib/api';
+import { api, type UpdateVideo } from '../lib/api';
 import { ytThumb, youtubeId } from '../lib/youtube';
-
-interface NewsItem {
-  id?: number | string;
-  url?: string;
-  news_url?: string;
-  youtube_url?: string;
-  dscription?: string;
-  description?: string;
-  title?: string;
-  thumbnail_url?: string;
-  created_at?: string;
-}
 
 interface UpdatesProps {
   onPlay: (video: UpdateVideo) => void;
@@ -28,24 +16,20 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
 
-  const [news, setNews] = useState<NewsItem[]>([]);
+  const [news, setNews] = useState<UpdateVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useAdmin();
 
   useEffect(() => {
     async function loadNews() {
       try {
-        const res = await fetch('/data.json');
-        const json = await res.json();
-        
-        // Handle both Array format and Object format safely
-        const rawList = Array.isArray(json) ? json : (json?.updates || json?.news || []);
-        
-        // Match any existing URL key (url, news_url, youtube_url)
-        const filtered = rawList.filter((item: NewsItem) => item.url || item.news_url || item.youtube_url);
-        setNews(filtered);
+        // This now securely uses the fixed api.ts file to pull from data.json
+        const data = await api.updates.list();
+        // Filter out items that are entirely empty
+        const validNews = data.filter(item => item.youtube_url || item.title !== 'সংবাদ আপডেট');
+        setNews(validNews);
       } catch (err) {
-        console.error('Error loading static JSON news:', err);
+        console.error('Error loading news:', err);
       } finally {
         setLoading(false);
       }
@@ -90,23 +74,13 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
           {!loading &&
             news.map((item, i) => {
-              const videoUrl = item.url || item.news_url || item.youtube_url || '';
-              const titleText = item.title || item.dscription || item.description || 'সংবাদ আপডেট';
-              const thumb = item.thumbnail_url || ytThumb(videoUrl);
+              const thumb = ytThumb(item.youtube_url);
 
               const handleItemClick = () => {
-                if (youtubeId(videoUrl)) {
-                  onPlay({
-                    id: (Number(item.id) || i + 1) as any,
-                    title: titleText,
-                    youtube_url: videoUrl,
-                    category: 'সংবাদ',
-                    featured: false,
-                    sort_order: i,
-                    created_at: item.created_at || '',
-                  });
-                } else if (videoUrl) {
-                  window.open(videoUrl, '_blank');
+                if (youtubeId(item.youtube_url)) {
+                  onPlay(item);
+                } else if (item.youtube_url) {
+                  window.open(item.youtube_url, '_blank');
                 }
               };
 
@@ -127,7 +101,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
                       {thumb ? (
                         <img
                           src={thumb}
-                          alt={titleText}
+                          alt={item.title}
                           loading="lazy"
                           decoding="async"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -140,7 +114,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
                       <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
 
                       <span className="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/40 bg-sindoor/90 text-white shadow-xl transition-transform duration-300 group-hover:scale-110">
-                        {youtubeId(videoUrl) ? (
+                        {youtubeId(item.youtube_url) ? (
                           <Play className="ml-1 h-7 w-7 fill-white" />
                         ) : (
                           <ExternalLink className="h-7 w-7 stroke-white" />
@@ -150,11 +124,11 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
                     <div className="p-4 sm:p-5">
                       <h3 className="font-editorial text-lg font-bold leading-snug text-ink transition-colors group-hover:text-sindoor">
-                        {titleText}
+                        {item.title}
                       </h3>
                       <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
                         <Youtube className="h-3.5 w-3.5 text-sindoor" />
-                        {youtubeId(videoUrl) ? 'ইন-অ্যাপ প্লেয়ারে দেখুন' : 'ইউটিউবে সরাসরি দেখুন'}
+                        {youtubeId(item.youtube_url) ? 'ইন-অ্যাপ প্লেয়ারে দেখুন' : 'ইউটিউবে সরাসরি দেখুন'}
                       </p>
                     </div>
                   </div>
@@ -164,7 +138,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
           {!loading && news.length === 0 && (
             <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
-              এখনও কোনো খবর আপডেট যোগ হয়নি — GitHub-এর data.json ফাইল চেক করুন।
+              নতুন কোড লাইভ হয়েছে! কিন্তু data.json-এ কোনো ভিডিও পাওয়া যায়নি।
             </p>
           )}
 
