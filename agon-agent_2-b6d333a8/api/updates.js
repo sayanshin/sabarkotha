@@ -1,77 +1,184 @@
-import fs from 'fs';
-import path from 'path';
-import { cors, requireAdmin } from './admin.js';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ExternalLink, Play, Plus, Youtube } from 'lucide-react';
+import SectionHeading from '../components/SectionHeading';
+import { useAdmin } from '../context/AdminContext';
+import { type UpdateVideo } from '../lib/api';
+import { ytThumb, youtubeId } from '../lib/youtube';
 
-// Helper function to read static JSON safely
-function getStaticData() {
-  try {
-    const filePath = path.join(process.cwd(), 'public', 'data.json');
-    if (!fs.existsSync(filePath)) return [];
-    const rawData = fs.readFileSync(filePath, 'utf8');
-    const json = JSON.parse(rawData);
-    
-    // Support both raw array format and object format with updates property
-    const list = Array.isArray(json) ? json : (json.updates || []);
-    
-    return list.map((item, index) => ({
-      id: item.id || index + 1,
-      title: item.dscription || item.title || 'সংবাদ আপডেট',
-      youtube_url: item.news_url || item.youtube_url || '',
-      category: 'সংবাদ',
-      featured: false,
-      sort_order: index,
-      created_at: item.created_at || new Date().toISOString(),
-    }));
-  } catch (err) {
-    console.error('Error reading static data.json:', err);
-    return [];
-  }
+interface NewsItem {
+  id?: number | string;
+  url?: string;
+  news_url?: string;
+  youtube_url?: string;
+  dscription?: string;
+  description?: string;
+  title?: string;
+  thumbnail_url?: string;
+  created_at?: string;
 }
 
-export default async function handler(req, res) {
-  cors(res);
-  if (req.method === 'OPTIONS') return res.status(204).end();
+interface UpdatesProps {
+  onPlay: (video: UpdateVideo) => void;
+  onManage: () => void;
+}
 
-  try {
-    if (req.method === 'GET') {
-      const data = getStaticData();
-      return res.status(200).json(data);
-    }
+export default function Updates({ onPlay, onManage }: UpdatesProps) {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
 
-    if (!requireAdmin(req, res)) return;
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { isAdmin } = useAdmin();
 
-    // Static mode mock responses for write operations
-    if (req.method === 'POST') {
-      const { title, youtube_url, category, featured, sort_order } = req.body || {};
-      if (!title || !youtube_url) {
-        return res.status(400).json({ error: 'শিরোনাম ও ইউটিউব লিংক আবশ্যক (title and youtube_url required)' });
+  useEffect(() => {
+    async function loadNews() {
+      try {
+        const res = await fetch('/data.json');
+        const json = await res.json();
+        
+        // Handle both Array format and Object format safely
+        const rawList = Array.isArray(json) ? json : (json?.updates || json?.news || []);
+        
+        // Match any existing URL key (url, news_url, youtube_url)
+        const filtered = rawList.filter((item: NewsItem) => item.url || item.news_url || item.youtube_url);
+        setNews(filtered);
+      } catch (err) {
+        console.error('Error loading static JSON news:', err);
+      } finally {
+        setLoading(false);
       }
-      return res.status(201).json({
-        id: Date.now(),
-        title,
-        youtube_url,
-        category: category || 'সংবাদ',
-        featured: !!featured,
-        sort_order: Number.isFinite(sort_order) ? sort_order : 0,
-        created_at: new Date().toISOString()
-      });
     }
+    loadNews();
+  }, []);
 
-    if (req.method === 'PUT') {
-      const { id, title, youtube_url } = req.body || {};
-      if (!id) return res.status(400).json({ error: 'id required' });
-      return res.status(200).json({ id, title, youtube_url });
-    }
+  return (
+    <section id="updates" ref={ref} className="relative scroll-mt-24 overflow-hidden">
+      <motion.div style={{ y: bgY }} className="absolute inset-x-0 top-0 h-[620px]" aria-hidden="true">
+        <img
+          src="/assets/asset1.png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover object-top"
+        />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-paper to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-b from-transparent via-paper/70 to-paper" />
+      </motion.div>
 
-    if (req.method === 'DELETE') {
-      const { id } = req.body || {};
-      if (!id) return res.status(400).json({ error: 'id required' });
-      return res.status(200).json({ ok: true });
-    }
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-24 pt-24 sm:pt-32">
+        <div className="paper-ribbon">
+          <SectionHeading
+            kicker="Updates"
+            title="আজকের বড় খবর"
+            sub="পুজো মণ্ডপের সিঁদুর থেকে পাড়ার চায়ের দোকান — প্রতিদিনের নির্বাচিত ভিডিও সংবাদ"
+          />
+        </div>
 
-    return res.status(405).json({ error: 'Method not allowed' });
-  } catch (err) {
-    console.error('Updates API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+        <div className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+          {loading &&
+            [0, 1, 2].map((i) => (
+              <div key={i} className="paper-card animate-pulse overflow-hidden p-0">
+                <div className="aspect-video bg-ink/10" />
+                <div className="space-y-2 p-4">
+                  <div className="h-4 w-3/4 rounded bg-ink/10" />
+                  <div className="h-3 w-1/3 rounded bg-ink/10" />
+                </div>
+              </div>
+            ))}
+
+          {!loading &&
+            news.map((item, i) => {
+              const videoUrl = item.url || item.news_url || item.youtube_url || '';
+              const titleText = item.title || item.dscription || item.description || 'সংবাদ আপডেট';
+              const thumb = item.thumbnail_url || ytThumb(videoUrl);
+
+              const handleItemClick = () => {
+                if (youtubeId(videoUrl)) {
+                  onPlay({
+                    id: (Number(item.id) || i + 1) as any,
+                    title: titleText,
+                    youtube_url: videoUrl,
+                    category: 'সংবাদ',
+                    featured: false,
+                    sort_order: i,
+                    created_at: item.created_at || '',
+                  });
+                } else if (videoUrl) {
+                  window.open(videoUrl, '_blank');
+                }
+              };
+
+              return (
+                <motion.article
+                  key={item.id || i}
+                  initial={{ opacity: 0, y: 34 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ delay: (i % 3) * 0.1, duration: 0.55 }}
+                  className={`group relative cursor-pointer ${
+                    i % 2 === 0 ? 'sm:-rotate-[0.6deg]' : 'sm:rotate-[0.7deg]'
+                  } transition-transform hover:rotate-0`}
+                  onClick={handleItemClick}
+                >
+                  <div className="paper-card overflow-hidden p-0">
+                    <div className="relative aspect-video overflow-hidden bg-ink">
+                      {thumb ? (
+                        <img
+                          src={thumb}
+                          alt={titleText}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#c4442a,#7c1409)]">
+                          <Youtube className="h-16 w-16 text-paper-soft/90" strokeWidth={1.4} />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+
+                      <span className="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/40 bg-sindoor/90 text-white shadow-xl transition-transform duration-300 group-hover:scale-110">
+                        {youtubeId(videoUrl) ? (
+                          <Play className="ml-1 h-7 w-7 fill-white" />
+                        ) : (
+                          <ExternalLink className="h-7 w-7 stroke-white" />
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="p-4 sm:p-5">
+                      <h3 className="font-editorial text-lg font-bold leading-snug text-ink transition-colors group-hover:text-sindoor">
+                        {titleText}
+                      </h3>
+                      <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+                        <Youtube className="h-3.5 w-3.5 text-sindoor" />
+                        {youtubeId(videoUrl) ? 'ইন-অ্যাপ প্লেয়ারে দেখুন' : 'ইউটিউবে সরাসরি দেখুন'}
+                      </p>
+                    </div>
+                  </div>
+                </motion.article>
+              );
+            })}
+
+          {!loading && news.length === 0 && (
+            <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
+              এখনও কোনো খবর আপডেট যোগ হয়নি — GitHub-এর data.json ফাইল চেক করুন।
+            </p>
+          )}
+
+          {isAdmin && (
+            <button
+              onClick={onManage}
+              className="group flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-[18px] border-[3px] border-dashed border-sindoor/45 bg-sindoor/5 text-sindoor transition-colors hover:bg-sindoor/10"
+            >
+              <Plus className="h-9 w-9 transition-transform group-hover:rotate-90" />
+              <span className="font-bangla text-base font-bold">নতুন খবর যোগ করুন</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
+  );
 }
