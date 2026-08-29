@@ -69,17 +69,17 @@ export default function Story({ onPlay, onManage }: StoryProps) {
   }, []);
 
   return (
-    <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden bg-slate-950 py-24 text-white">
-      {/* Background Image: 06-Story-Haunted-Village.png */}
+    <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden bg-[#0a0808] py-24 text-white">
+      {/* Background Image */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 z-0" aria-hidden="true">
         <img
           src="/06-Story-Haunted-Village.png"
           alt=""
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover object-center filter brightness-50 contrast-125"
+          className="h-full w-full object-cover object-center filter brightness-[0.4] contrast-125 opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/40 to-slate-950" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0808]/90 via-transparent to-[#0a0808]" />
       </motion.div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4">
@@ -94,11 +94,11 @@ export default function Story({ onPlay, onManage }: StoryProps) {
         <div className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {loading &&
             [0, 1, 2].map((i) => (
-              <div key={i} className="animate-pulse rounded-2xl border border-slate-700/60 bg-slate-900/80 p-0 shadow-lg backdrop-blur-md">
-                <div className="aspect-video bg-slate-800/60 rounded-t-2xl" />
+              <div key={i} className="animate-pulse rounded-2xl border border-[#2a2421] bg-[#14100e]/80 p-0 shadow-lg">
+                <div className="aspect-video bg-[#251d18]/60 rounded-t-2xl" />
                 <div className="space-y-2 p-5">
-                  <div className="h-4 w-3/4 rounded bg-slate-800/60" />
-                  <div className="h-3 w-1/3 rounded bg-slate-800/60" />
+                  <div className="h-4 w-3/4 rounded bg-[#251d18]/60" />
+                  <div className="h-3 w-1/3 rounded bg-[#251d18]/60" />
                 </div>
               </div>
             ))}
@@ -136,8 +136,8 @@ export default function Story({ onPlay, onManage }: StoryProps) {
                   className="group relative cursor-pointer"
                   onClick={handleItemClick}
                 >
-                  {/* Dark Silver Card Frame with Glassmorphism */}
-                  <div className="overflow-hidden rounded-2xl border border-slate-500/40 bg-slate-900/90 shadow-2xl backdrop-blur-md transition-all duration-300 hover:border-slate-300 hover:shadow-slate-500/20 hover:shadow-2xl">
+                  {/* Warm Deep Charcoal Card */}
+                  <div className="overflow-hidden rounded-2xl border border-[#2e2622] bg-[#141110]/95 shadow-2xl transition-all duration-300 hover:border-[#c4442a]/60 hover:shadow-[#c4442a]/10 hover:shadow-2xl">
                     <div className="relative aspect-video overflow-hidden bg-black">
                       {thumb ? (
                         <img
@@ -148,25 +148,23 @@ export default function Story({ onPlay, onManage }: StoryProps) {
                           className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105 group-hover:opacity-100"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#334155,#0f172a)]">
-                          <Youtube className="h-16 w-16 text-slate-400" strokeWidth={1.4} />
+                        <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#c4442a,#121010)]">
+                          <Youtube className="h-16 w-16 text-stone-400" strokeWidth={1.4} />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#141110] via-transparent to-transparent opacity-80" />
 
-                      <span className="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/40 bg-sindoor/90 text-white shadow-xl transition-transform duration-300 group-hover:scale-110">
+                      <span className="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/30 bg-[#c4442a]/90 text-white shadow-xl transition-transform duration-300 group-hover:scale-110">
                         <Play className="ml-1 h-7 w-7 fill-white" />
                       </span>
                     </div>
 
                     <div className="p-5">
-                      {/* Crisp White Title */}
-                      <h3 className="font-editorial text-lg font-bold leading-snug text-white transition-colors group-hover:text-sindoor">
+                      <h3 className="font-editorial text-lg font-bold leading-snug text-white transition-colors group-hover:text-[#c4442a]">
                         {titleText}
                       </h3>
-                      {/* Light Silver Subtext */}
-                      <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-300">
-                        <Moon className="h-3.5 w-3.5 text-sindoor" />
+                      <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-[#dcd3c9]/80">
+                        <Moon className="h-3.5 w-3.5 text-[#c4442a]" />
                         প্লেয়ারে শুনুন
                       </p>
                     </div>
@@ -176,10 +174,10 @@ export default function Story({ onPlay, onManage }: StoryProps) {
             })}
 
           {!loading && stories.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-600/50 bg-slate-900/80 p-10 text-center">
-              <Moon className="h-12 w-12 text-slate-400" />
+            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#2e2622] bg-[#141110]/80 p-10 text-center">
+              <Moon className="h-12 w-12 text-[#dcd3c9]/40" />
               <h3 className="mt-4 font-bangla text-lg font-bold text-white">রাত বিরেতে গল্প শোনার ঠিকানা</h3>
-              <p className="mt-1 font-bangla text-xs text-slate-400">
+              <p className="mt-1 font-bangla text-xs text-[#dcd3c9]/60">
                 এখনও কোনো গল্প যোগ হয়নি — data.json ফাইলে "stories" অ্যারে যোগ করুন।
               </p>
             </div>
@@ -188,7 +186,7 @@ export default function Story({ onPlay, onManage }: StoryProps) {
           {onManage && (
             <button
               onClick={onManage}
-              className="group flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-2xl border-[3px] border-dashed border-slate-500/50 bg-slate-900/60 text-slate-300 transition-colors hover:border-sindoor hover:bg-slate-900 hover:text-white"
+              className="group flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-2xl border-[3px] border-dashed border-[#c4442a]/40 bg-[#c4442a]/5 text-[#c4442a] transition-colors hover:bg-[#c4442a]/10 hover:text-white"
             >
               <Plus className="h-9 w-9 transition-transform group-hover:rotate-90" />
               <span className="font-bangla text-base font-bold">নতুন গল্প যোগ করুন</span>
