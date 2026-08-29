@@ -1,1 +1,14 @@
-
+[
+  {
+    "id": 1,
+    "news_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "dscription": "প্রথম বাংলা ভিদেও আপডেট",
+    "thumbnail_url": ""
+  },
+  {
+    "id": 2,
+    "news_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "dscription": "দ্বিতীয় সংবাদ আপডেট",
+    "thumbnail_url": ""
+  }
+]
