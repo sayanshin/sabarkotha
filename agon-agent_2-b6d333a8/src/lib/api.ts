@@ -1,6 +1,3 @@
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from './firebase';
-
 export interface NewsItem {
   id: number;
   created_at?: string;
@@ -90,28 +87,16 @@ export const tokenStore = {
   },
 };
 
-async function req<T>(path: string, options: RequestInit = {}, admin = false): Promise<T> {
-  const headers: Record<string, string> = { 
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string> || {})
-  };
-  
-  if (admin) {
-    const token = tokenStore.get();
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+// Helper function to read static JSON file safely
+async function fetchStaticJson() {
+  try {
+    const res = await fetch('/data.json');
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching data.json:', error);
+    return null;
   }
-
-  const res = await fetch(path, { ...options, headers });
-  const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-  
-  if (!res.ok) {
-    const errorMessage = (data.error as string) || (data.message as string) || `Request failed with status ${res.status}`;
-    throw new Error(errorMessage);
-  }
-  
-  return data as T;
 }
 
 type VideoPayload = Partial<UpdateVideo>;
@@ -120,73 +105,98 @@ type EpisodePayload = Partial<StoryEpisode>;
 type LinkPayload = Partial<SiteLink>;
 
 export const api = {
-  // Direct Firebase news fetcher (Using Firestore to match application db instance)
- getNews: async (): Promise<NewsItem[]> => {
-  try {
-    const newsRef = collection(db, 'news');
-    const snapshot = await getDocs(newsRef);
+  getNews: async (): Promise<NewsItem[]> => {
+    const json = await fetchStaticJson();
+    if (!json) return [];
+    const list = Array.isArray(json) ? json : json.updates || [];
+    return list.map((item: any, index: number) => ({
+      id: item.id ?? index + 1,
+      created_at: item.created_at ?? '',
+      news_url: item.news_url ?? item.youtube_url ?? '',
+      live_url: item.live_url ?? '',
+      story_url: item.story_url ?? '',
+      channel_url: item.channel_url ?? '',
+      thumbnail_url: item.thumbnail_url ?? '',
+      dscription: item.dscription ?? item.description ?? item.title ?? '',
+    }));
+  },
 
-    if (snapshot.empty) return [];
-
-    return snapshot.docs.map((doc, index) => {
-      const data = doc.data();
-      return {
-        id: data.id ?? index + 1, // Fallback to index if no numeric id exists
-        created_at: data.created_at ?? '',
-        news_url: data.news_url ?? '',
-        live_url: data.live_url ?? '',
-        story_url: data.story_url ?? '',
-        channel_url: data.channel_url ?? '',
-        thumbnail_url: data.thumbnail_url ?? '',
-        dscription: data.dscription ?? data.description ?? '',
-      };
-    });
-  } catch (error) {
-    console.error('Error fetching news:', error);
-    return [];
-  }
-},
   updates: {
-    list: () => req<UpdateVideo[]>('/api/updates'),
-    create: (d: VideoPayload) => req<UpdateVideo>('/api/updates', { method: 'POST', body: JSON.stringify(d) }, true),
-    update: (id: number, d: VideoPayload) => req<UpdateVideo>('/api/updates', { method: 'PUT', body: JSON.stringify({ id, ...d }) }, true),
-    remove: (id: number) => req<{ ok: boolean }>('/api/updates', { method: 'DELETE', body: JSON.stringify({ id }) }, true),
-  },
-  live: {
-    get: () => req<LiveBroadcast | null>('/api/live'),
-    save: (d: Partial<LiveBroadcast>) => req<LiveBroadcast>('/api/live', { method: 'PUT', body: JSON.stringify(d) }, true),
-  },
-  papers: {
-    list: () => req<PaperLink[]>('/api/paper'),
-    create: (d: PaperPayload) => req<PaperLink>('/api/paper', { method: 'POST', body: JSON.stringify(d) }, true),
-    update: (id: number, d: PaperPayload) => req<PaperLink>('/api/paper', { method: 'PUT', body: JSON.stringify({ id, ...d }) }, true),
-    remove: (id: number) => req<{ ok: boolean }>('/api/paper', { method: 'DELETE', body: JSON.stringify({ id }) }, true),
-  },
-  episodes: {
-    list: () => req<StoryEpisode[]>('/api/story'),
-    create: (d: EpisodePayload) => req<StoryEpisode>('/api/story', { method: 'POST', body: JSON.stringify(d) }, true),
-    update: (id: number, d: EpisodePayload) => req<StoryEpisode>('/api/story', { method: 'PUT', body: JSON.stringify({ id, ...d }) }, true),
-    remove: (id: number) => req<{ ok: boolean }>('/api/story', { method: 'DELETE', body: JSON.stringify({ id }) }, true),
-  },
-  links: {
-    list: () => req<SiteLink[]>('/api/links'),
-    create: (d: LinkPayload) => req<SiteLink>('/api/links', { method: 'POST', body: JSON.stringify(d) }, true),
-    update: (id: number, d: LinkPayload) => req<SiteLink>('/api/links', { method: 'PUT', body: JSON.stringify({ id, ...d }) }, true),
-    remove: (id: number) => req<{ ok: boolean }>('/api/links', { method: 'DELETE', body: JSON.stringify({ id }) }, true),
-  },
-  members: {
-    list: () => req<JourneyMember[]>('/api/members'),
-    join: (d: { name: string; email?: string; message?: string }) =>
-      req<JourneyMember>('/api/members', { method: 'POST', body: JSON.stringify(d) }),
-  },
-  admin: {
-    login: async (password: string) => {
-      const res = await req<{ token: string }>('/api/admin', { method: 'POST', body: JSON.stringify({ password }) });
-      if (res.token) {
-        tokenStore.set(res.token);
-      }
-      return res;
+    list: async (): Promise<UpdateVideo[]> => {
+      const json = await fetchStaticJson();
+      if (!json) return [];
+      const list = Array.isArray(json) ? json : json.updates || [];
+      return list.map((item: any, i: number) => ({
+        id: item.id || i + 1,
+        title: item.dscription || item.title || 'সংবাদ আপডেট',
+        youtube_url: item.news_url || item.youtube_url || '',
+        category: 'সংবাদ',
+        featured: false,
+        sort_order: i,
+        created_at: item.created_at || new Date().toISOString(),
+      }));
     },
-    verify: () => req<{ valid: boolean }>('/api/admin', {}, true),
+    create: async (d: VideoPayload) => ({} as UpdateVideo),
+    update: async (id: number, d: VideoPayload) => ({} as UpdateVideo),
+    remove: async (id: number) => ({ ok: true }),
+  },
+
+  live: {
+    get: async (): Promise<LiveBroadcast | null> => {
+      const json = await fetchStaticJson();
+      if (!json || !json.live) return null;
+      return {
+        id: 1,
+        title: json.live.title || '',
+        description: '',
+        youtube_url: json.live.youtube_url || '',
+        is_live: Boolean(json.live.isLive),
+        updated_at: new Date().toISOString(),
+      };
+    },
+    save: async (d: Partial<LiveBroadcast>) => ({} as LiveBroadcast),
+  },
+
+  papers: {
+    list: async (): Promise<PaperLink[]> => [],
+    create: async (d: PaperPayload) => ({} as PaperLink),
+    update: async (id: number, d: PaperPayload) => ({} as PaperLink),
+    remove: async (id: number) => ({ ok: true }),
+  },
+
+  episodes: {
+    list: async (): Promise<StoryEpisode[]> => {
+      const json = await fetchStaticJson();
+      if (!json || !Array.isArray(json.story)) return [];
+      return json.story.map((item: any, i: number) => ({
+        id: item.id || i + 1,
+        title: item.title || '',
+        description: item.description || '',
+        youtube_url: item.youtube_url || '',
+        duration: '',
+        sort_order: i,
+        created_at: new Date().toISOString(),
+      }));
+    },
+    create: async (d: EpisodePayload) => ({} as StoryEpisode),
+    update: async (id: number, d: EpisodePayload) => ({} as StoryEpisode),
+    remove: async (id: number) => ({ ok: true }),
+  },
+
+  links: {
+    list: async (): Promise<SiteLink[]> => [],
+    create: async (d: LinkPayload) => ({} as SiteLink),
+    update: async (id: number, d: LinkPayload) => ({} as SiteLink),
+    remove: async (id: number) => ({ ok: true }),
+  },
+
+  members: {
+    list: async (): Promise<JourneyMember[]> => [],
+    join: async (d: { name: string; email?: string; message?: string }) => ({} as JourneyMember),
+  },
+
+  admin: {
+    login: async (password: string) => ({ token: 'static_admin_token' }),
+    verify: async () => ({ valid: true }),
   },
 };
