@@ -3,8 +3,16 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ExternalLink, Play, Plus, Youtube } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import { useAdmin } from '../context/AdminContext';
-import { api, type NewsItem, type UpdateVideo } from '../lib/api';
+import { type UpdateVideo } from '../lib/api';
 import { ytThumb, youtubeId } from '../lib/youtube';
+
+interface NewsItem {
+  id: number | string;
+  news_url: string;
+  dscription?: string;
+  thumbnail_url?: string;
+  created_at?: string;
+}
 
 interface UpdatesProps {
   onPlay: (video: UpdateVideo) => void;
@@ -23,12 +31,13 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
   useEffect(() => {
     async function loadNews() {
       try {
-        const data = await api.getNews();
-        // Filter only items that have news_url
+        // Fetching directly from public/data.json on GitHub
+        const res = await fetch('/data.json');
+        const data: NewsItem[] = await res.json();
         const filtered = (data || []).filter((item) => item.news_url);
         setNews(filtered);
       } catch (err) {
-        console.error('Error loading news:', err);
+        console.error('Error loading static JSON news:', err);
       } finally {
         setLoading(false);
       }
@@ -146,7 +155,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
           {!loading && news.length === 0 && (
             <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
-              এখনও কোনো খবর আপডেট যোগ হয়নি — সরাসরি Supabase থেকে ডেটা আসছে।
+              এখনও কোনো খবর আপডেট যোগ হয়নি — GitHub-এর data.json ফাইল থেকে ডেটা লোড করার চেষ্টা করা হচ্ছে।
             </p>
           )}
 
