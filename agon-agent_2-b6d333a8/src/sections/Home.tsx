@@ -1,9 +1,8 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ChevronDown, Sparkles, Users } from 'lucide-react';
+import { ChevronDown, Sparkles, Megaphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
-import { toBanglaDigits } from '../lib/bn';
 
 interface HomeProps {
   onJoin: () => void;
@@ -15,15 +14,11 @@ export default function Home({ onJoin }: HomeProps) {
   const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
   const fgY = useTransform(scrollYProgress, [0, 1], ['0%', '-16%']);
   const fade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const { members } = useData();
   const { user } = useAuth();
 
-  const travellerNames = members.slice(0, 14);
-
-  const marqueeContent =
-    travellerNames.length > 0
-      ? travellerNames.map((m) => `${m.name}${m.message ? ` — ${m.message}` : ''}`)
-      : ['আপনিই হতে পারেন প্রথম যাত্রী', 'Be the first to join the journey'];
+  const marqueeContent = [
+    'কম খরচে বিজ্ঞাপন দিন — Sabar Kotha TV-তে — যোগাযোগ → 9804002449 / 9474148706'
+  ];
 
   return (
     <section id="home" ref={ref} className="relative scroll-mt-24 overflow-hidden">
@@ -36,7 +31,7 @@ export default function Home({ onJoin }: HomeProps) {
           decoding="async"
           className="h-full w-full scale-110 object-cover object-center"
         />
-        {/* warm sky wash + readability veils (top for nav, center behind title) */}
+        {/* warm sky wash + readability veils */}
         <div className="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-paper via-paper/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-b from-paper/10 via-transparent to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-paper" />
@@ -68,7 +63,7 @@ export default function Home({ onJoin }: HomeProps) {
           সম্প্রচারে · প্রতি দিন · গ্রাম থেকে শহর
         </motion.p>
 
-        {/* THE OFFICIAL UPLOADED LOGO — used exactly as provided, never altered */}
+        {/* LOGO */}
         <motion.div
           initial={{ opacity: 0, y: 34, rotate: -5, scale: 0.94 }}
           animate={{ opacity: 1, y: 0, rotate: -2, scale: 1 }}
@@ -132,20 +127,20 @@ export default function Home({ onJoin }: HomeProps) {
         </motion.div>
       </motion.div>
 
-      {/* journey wall marquee — real members from the database */}
+      {/* Advertisement Marquee Bar */}
       <div className="absolute inset-x-0 bottom-8 z-10 mx-auto max-w-4xl px-4">
         <div
           className="overflow-hidden rounded-full border border-ink/15 bg-paper-soft/85 py-2.5 shadow-paper backdrop-blur-sm"
           role="marquee"
-          aria-label="Recent journey members"
+          aria-label="Advertisement Banner"
         >
           <div className="flex items-center gap-3 px-4">
             <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-sindoor px-3 py-1 text-xs font-bold text-paper-soft">
-              <Users className="h-3.5 w-3.5" />
-              যাত্রী পরিবার{members.length > 0 ? ` · ${toBanglaDigits(members.length)} জন` : ''}
+              <Megaphone className="h-3.5 w-3.5" />
+              📢 বিজ্ঞাপন দিন
             </span>
             <div className="marquee flex-1">
-              <div className="marquee-track font-bangla text-sm text-ink/80">
+              <div className="marquee-track font-bangla text-sm font-semibold text-ink/90">
                 {[0, 1].map((copy) => (
                   <span key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
                     {marqueeContent.map((entry, i) => (
@@ -159,6 +154,10 @@ export default function Home({ onJoin }: HomeProps) {
             </div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
       </div>
     </section>
   );
