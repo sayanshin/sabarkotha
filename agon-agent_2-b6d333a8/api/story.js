@@ -1,68 +1,114 @@
-import supabase from './db-client.js';
-import { cors, requireAdmin } from './admin.js';
+import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
+import { Play, Sparkles } from 'lucide-react';
+import SectionHeading from '../components/SectionHeading';
+import { type UpdateVideo } from '../lib/api';
+import { youtubeId, ytThumb } from '../lib/youtube';
 
-export default async function handler(req, res) {
-  cors(res);
-  if (req.method === 'OPTIONS') return res.status(204).end();
+interface StoryEpisode {
+  id: number | string;
+  title: string;
+  youtube_url: string;
+  thumbnail_url?: string;
+}
 
-  try {
-    if (req.method === 'GET') {
-      const { data, error } = await supabase
-        .from('story_episodes')
-        .select('*')
-        .order('sort_order', { ascending: true })
-        .order('id', { ascending: false })
-        .limit(40);
-      if (error) throw error;
-      return res.status(200).json(data);
-    }
+interface StoryProps {
+  onPlay: (video: UpdateVideo) => void;
+}
 
-    if (!requireAdmin(req, res)) return;
+export default function Story({ onPlay }: StoryProps) {
+  const [episodes, setEpisodes] = useState<StoryEpisode[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    if (req.method === 'POST') {
-      const { title, description, youtube_url, duration, sort_order } = req.body || {};
-      if (!title || !youtube_url) {
-        return res.status(400).json({ error: 'শিরোনাম ও ইউটিউব লিংক আবশ্যক (title and youtube_url required)' });
+  useEffect(() => {
+    async function loadStories() {
+      try {
+        const res = await fetch('/data.json');
+        const json = await res.json();
+        setEpisodes(json.story || []);
+      } catch (err) {
+        console.error('Error fetching story episodes:', err);
+      } finally {
+        setLoading(false);
       }
-      const { data, error } = await supabase
-        .from('story_episodes')
-        .insert({
-          title,
-          description: description || '',
-          youtube_url,
-          duration: duration || '',
-          sort_order: Number.isFinite(sort_order) ? sort_order : 0,
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      return res.status(201).json(data);
     }
+    loadStories();
+  }, []);
 
-    if (req.method === 'PUT') {
-      const { id, title, description, youtube_url, duration, sort_order } = req.body || {};
-      if (!id) return res.status(400).json({ error: 'id required' });
-      const { data, error } = await supabase
-        .from('story_episodes')
-        .update({ title, description, youtube_url, duration, sort_order: sort_order ?? 0 })
-        .eq('id', id)
-        .select()
-        .single();
-      if (error) throw error;
-      return res.status(200).json(data);
-    }
+  return (
+    <section id="story" className="relative overflow-hidden bg-paper-dark py-24 text-paper-soft">
+      <div className="mx-auto max-w-6xl px-4">
+        <SectionHeading
+          kicker="Audio Stories"
+          title="গল্পের আসর"
+          sub="রহস্য, রোমাঞ্চ ও ভীতি — অলৌকিক অভিজ্ঞতার অডিও ড্রামা"
+          light
+        />
 
-    if (req.method === 'DELETE') {
-      const { id } = req.body || {};
-      if (!id) return res.status(400).json({ error: 'id required' });
-      const { error } = await supabase.from('story_episodes').delete().eq('id', id);
-      if (error) throw error;
-      return res.status(200).json({ ok: true });
-    }
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {loading &&
+            [0, 1, 2].map((i) => (
+              <div key={i} className="animate-pulse rounded-2xl bg-paper-soft/5 p-4">
+                <div className="aspect-video rounded-xl bg-paper-soft/10" />
+                <div className="mt-4 h-5 w-3/4 rounded bg-paper-soft/10" />
+              </div>
+            ))}
 
-    return res.status(405).json({ error: 'Method not allowed' });
-  } catch (err) {
-    console.error('Story API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+          {!loading &&
+            episodes.map((item, i) => {
+              const url = item.youtube_url || '';
+              const thumb = item.thumbnail_url || ytThumb(url);
+
+              return (
+                <motion.article
+                  key={item.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: (i % 3) * 0.1, duration: 0.5 }}
+                  className="group relative cursor-pointer overflow-hidden rounded-2xl border border-paper-soft/10 bg-paper-soft/5 p-4 transition-colors hover:border-sindoor/40 hover:bg-paper-soft/10"
+                  onClick={() =>
+                    youtubeId(url) &&
+                    onPlay({
+                      id: Number(item.id) || (item.id as any),
+                      title: item.title,
+                      youtube_url: url,
+                      category: 'গল্প',
+                      featured: false,
+                      sort_order: i,
+                      created_at: '',
+                    })
+                  }
+                >
+                  <div className="relative aspect-video overflow-hidden rounded-xl bg-ink">
+                    {thumb ? (
+                      <img
+                        src={thumb}
+                        alt={item.title}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-paper-soft/10">
+                        <Sparkles className="h-10 w-10 text-sindoor" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent" />
+                    <span className="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-full bg-sindoor text-white shadow-lg transition-transform group-hover:scale-110">
+                      <Play className="ml-1 h-6 w-6 fill-white" />
+                    </span>
+                  </div>
+
+                  <div className="mt-4">
+                    <h3 className="font-editorial text-lg font-bold leading-snug text-paper-soft transition-colors group-hover:text-sindoor">
+                      {item.title}
+                    </h3>
+                  </div>
+                </motion.article>
+              );
+            })}
+        </div>
+      </div>
+    </section>
+  );
 }
