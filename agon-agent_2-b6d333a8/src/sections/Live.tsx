@@ -2,15 +2,36 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Radio, Tv } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
-import { type LiveStream } from '../lib/api';
-import { youtubeEmbedUrl } from '../lib/youtube';
+
+export interface LiveStreamData {
+  is_live: boolean;
+  title: string;
+  youtube_url: string;
+}
 
 interface LiveProps {
-  onPlay: (video: { id: number; title: string; youtube_url: string; category: string; featured: boolean; sort_order: number; created_at: string }) => void;
+  onPlay: (video: {
+    id: number;
+    title: string;
+    youtube_url: string;
+    category: string;
+    featured: boolean;
+    sort_order: number;
+    created_at: string;
+  }) => void;
+  onManage?: () => void;
+}
+
+// Local helper to transform YouTube URLs to Embed URLs cleanly
+function getEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|live\/)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? `https://www.youtube.com/embed/${match[2]}` : null;
 }
 
 export default function Live({ onPlay }: LiveProps) {
-  const [stream, setStream] = useState<LiveStream | null>(null);
+  const [stream, setStream] = useState<LiveStreamData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +40,6 @@ export default function Live({ onPlay }: LiveProps) {
         const res = await fetch('/data.json');
         const json = await res.json();
         
-        // Read live data object from static data.json safely
         if (json && json.live) {
           setStream({
             is_live: Boolean(json.live.isLive ?? json.live.is_live),
@@ -36,7 +56,7 @@ export default function Live({ onPlay }: LiveProps) {
     loadLiveStream();
   }, []);
 
-  const embedUrl = stream?.youtube_url ? youtubeEmbedUrl(stream.youtube_url) : null;
+  const embedUrl = stream?.youtube_url ? getEmbedUrl(stream.youtube_url) : null;
 
   return (
     <section id="live" className="relative min-h-[calc(100vh-5rem)] scroll-mt-24 overflow-hidden py-24">
@@ -80,7 +100,7 @@ export default function Live({ onPlay }: LiveProps) {
                 )}
               </span>
               <span className="font-bangla text-xs font-bold tracking-wide text-ink">
-                {stream?.is_live ? 'সরাসরি সম্পুচার চলছে' : 'অফলাইন'}
+                {stream?.is_live ? 'সরাসরি সম্প্রচার চলছে' : 'অফলাইন'}
               </span>
             </div>
 
@@ -137,8 +157,8 @@ export default function Live({ onPlay }: LiveProps) {
                     allowFullScreen
                   />
                 ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center text-center p-6 text-paper-soft">
-                    <Radio className="h-16 w-16 text-paper-soft/40 animate-pulse" />
+                  <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-paper-soft">
+                    <Radio className="h-16 w-16 animate-pulse text-paper-soft/40" />
                     <h3 className="font-editorial mt-4 text-xl font-bold">পরবর্তী লাইভ শিডিউল শীঘ্রই</h3>
                     <p className="mt-1 text-xs text-paper-soft/60">
                       The broadcast room is quiet — the dhak will sound again soon.
