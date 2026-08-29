@@ -1,79 +1,79 @@
-{ 
+{
   "live": {
     "isLive": true,
     "title": "অন্নপূর্ণা যোজনা নিয়ে শুভেন্দু অধিকারী",
     "youtube_url": "https://www.youtube.com/live/4mzvrQHtH78?si=wHdTx1ko6pv1nXmh"
   },
-"updates": [
-  {
-    "id": 1,
-    "news_url": "https://youtu.be/OiwW1lbThFw?si=qMLIAWP1OBohjC9m",
-    "dscription": "তৃণমূল নেতার মাংসের দোকান থেকে মানুষের মা*থার খু*লি উদ্ধার",
-    "thumbnail_url": ""
-  },
-  {
-    "id": 2,
-    "news_url": "https://youtu.be/n44KyAnjGIQ?si=8jd81Y4eKbLLK1vj",
-    "dscription": "ইছাপুর মণ্ডল বাড়িতে ২১৮তম দুর্গাপূজা, হরগৌরী রূপে পূজিত দেবী",
-    "thumbnail_url": ""
-  }
-   {
-    "id": 3,
-    "news_url": "https://youtu.be/fhyMHuYA1Hs?si=4LiUfk3oT01gwQIF",
-    "dscription": "নেতাজি কি সত্যিই বিমান দুর্ঘটনায় মারা গিয়েছিলেন?",
-    "thumbnail_url": ""
-  }
-   {
-    "id": 4,
-    "news_url": "https://youtu.be/IxKfFZxsCA8",
-    "dscription": "শিমুরালি স্টেশনে হকার উচ্ছেদ বুলডোজারে ভাঙা হলো একাধিক দোকান",
-    "thumbnail_url": ""
-  }
-   {
-    "id": 5,
-    "news_url": "https://youtu.be/1fgeOH-nrhU",
-    "dscription": "নবদ্বীপ শ্মশানে ঠাকুমার সাথে সহ মরণের চেস্টা নাতির",
-    "thumbnail_url": ""
-  }
-   {
-    "id": 6,
-    "news_url": "https://youtu.be/voOhSe7UKWw",
-    "dscription": "কুনাল ঘোষের অবস্থা দেখুন আজকের বিধানসভায়! আপনি কি বলবেন?",
-    "thumbnail_url": ""
-  }
-],
+  "updates": [
+    {
+      "id": 1,
+      "news_url": "https://youtu.be/OiwW1lbThFw?si=qMLIAWP1OBohjC9m",
+      "dscription": "তৃণমূল নেতার মাংসের দোকান থেকে মানুষের মা*থার খু*লি উদ্ধার",
+      "thumbnail_url": ""
+    },
+    {
+      "id": 2,
+      "news_url": "https://youtu.be/n44KyAnjGIQ?si=8jd81Y4eKbLLK1vj",
+      "dscription": "ইছাপুর মণ্ডল বাড়িতে ২১৮তম দুর্গাপূজা, হরগৌরী রূপে পূজিত দেবী",
+      "thumbnail_url": ""
+    },
+    {
+      "id": 3,
+      "news_url": "https://youtu.be/fhyMHuYA1Hs?si=4LiUfk3oT01gwQIF",
+      "dscription": "নেতাজি কি সত্যিই বিমান দুর্ঘটনায় মারা গিয়েছিলেন?",
+      "thumbnail_url": ""
+    },
+    {
+      "id": 4,
+      "news_url": "https://youtu.be/IxKfFZxsCA8",
+      "dscription": "শিমুরালি স্টেশনে হকার উচ্ছেদ বুলডোজারে ভাঙা হলো একাধিক দোকান",
+      "thumbnail_url": ""
+    },
+    {
+      "id": 5,
+      "news_url": "https://youtu.be/1fgeOH-nrhU",
+      "dscription": "নবদ্বীপ শ্মশানে ঠাকুমার সাথে সহ মরণের চেস্টা নাতির",
+      "thumbnail_url": ""
+    },
+    {
+      "id": 6,
+      "news_url": "https://youtu.be/voOhSe7UKWw",
+      "dscription": "কুনাল ঘোষের অবস্থা দেখুন আজকের বিধানসভায়! আপনি কি বলবেন?",
+      "thumbnail_url": ""
+    }
+  ],
   "story": [
     {
       "id": 1,
       "title": "ভৌতিক গল্প অবলম্বনে আজকের গল্প বুনো রাজবাড়ি",
       "youtube_url": "https://youtu.be/DiwqnDhXXQg",
       "thumbnail_url": ""
-    }
-     {
+    },
+    {
       "id": 2,
       "title": "ভৌতিক গল্প অশরীরী আত্মা",
       "youtube_url": "https://youtu.be/MQnMwovas2I",
       "thumbnail_url": ""
-    }
-     {
+    },
+    {
       "id": 3,
       "title": "ভৌতিক গল্প ডিটেক্টিভ অরিন্দম ও শ্মশানের ভূত",
       "youtube_url": "https://youtu.be/-neEJDALWMA",
       "thumbnail_url": ""
-    }
-     {
+    },
+    {
       "id": 4,
       "title": "ভৌতিক গল্প অমাবস্যার শেষ ট্রেন",
       "youtube_url": "https://youtu.be/eUOkc2vOE7o",
       "thumbnail_url": ""
-    }
-     {
+    },
+    {
       "id": 5,
-      "title": "ভৌতিক গল্প পুরোনো বাড়িতে ভুতের আড্ডা",
+      "title": "ভৌতিক গল্প পুরোনো বাড়িতে ভুতের আড্ডা",
       "youtube_url": "https://youtu.be/q9gUkZxODTk",
       "thumbnail_url": ""
-    }
-     {
+    },
+    {
       "id": 6,
       "title": "ভয়ংকর ভূতুড়ে গল্প",
       "youtube_url": "https://youtu.be/-6Aniim3nbE",
