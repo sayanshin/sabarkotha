@@ -42,7 +42,7 @@ function getYtThumb(url: string): string {
 export default function Story({ onPlay, onManage }: StoryProps) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
 
   const [stories, setStories] = useState<StoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +53,6 @@ export default function Story({ onPlay, onManage }: StoryProps) {
         const res = await fetch('/data.json');
         const json = await res.json();
         
-        // Read story array safely from static JSON structure
         const rawList: StoryItem[] = Array.isArray(json) 
           ? json 
           : (json.stories || json.story || []);
@@ -70,16 +69,17 @@ export default function Story({ onPlay, onManage }: StoryProps) {
   }, []);
 
   return (
-    <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden bg-ink py-24 text-paper-soft">
-      <motion.div style={{ y: bgY }} className="absolute inset-x-0 top-0 h-[650px] opacity-35" aria-hidden="true">
+    <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden bg-slate-950 py-24 text-white">
+      {/* Background Image: 06-Story-Haunted-Village.png */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 z-0" aria-hidden="true">
         <img
-          src="/assets/asset4.png"
+          src="/06-Story-Haunted-Village.png"
           alt=""
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover object-center filter grayscale"
+          className="h-full w-full object-cover object-center filter brightness-50 contrast-125"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink via-transparent to-ink" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/40 to-slate-950" />
       </motion.div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4">
@@ -94,11 +94,11 @@ export default function Story({ onPlay, onManage }: StoryProps) {
         <div className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {loading &&
             [0, 1, 2].map((i) => (
-              <div key={i} className="paper-card animate-pulse border-paper-soft/10 bg-paper-soft/5 p-0">
-                <div className="aspect-video bg-paper-soft/10" />
-                <div className="space-y-2 p-4">
-                  <div className="h-4 w-3/4 rounded bg-paper-soft/10" />
-                  <div className="h-3 w-1/3 rounded bg-paper-soft/10" />
+              <div key={i} className="animate-pulse rounded-2xl border border-slate-700/60 bg-slate-900/80 p-0 shadow-lg backdrop-blur-md">
+                <div className="aspect-video bg-slate-800/60 rounded-t-2xl" />
+                <div className="space-y-2 p-5">
+                  <div className="h-4 w-3/4 rounded bg-slate-800/60" />
+                  <div className="h-3 w-1/3 rounded bg-slate-800/60" />
                 </div>
               </div>
             ))}
@@ -136,7 +136,8 @@ export default function Story({ onPlay, onManage }: StoryProps) {
                   className="group relative cursor-pointer"
                   onClick={handleItemClick}
                 >
-                  <div className="paper-card border-paper-soft/20 bg-ink-soft/80 overflow-hidden p-0 backdrop-blur-sm transition-all duration-300 hover:border-sindoor/50">
+                  {/* Dark Silver Card Frame with Glassmorphism */}
+                  <div className="overflow-hidden rounded-2xl border border-slate-500/40 bg-slate-900/90 shadow-2xl backdrop-blur-md transition-all duration-300 hover:border-slate-300 hover:shadow-slate-500/20 hover:shadow-2xl">
                     <div className="relative aspect-video overflow-hidden bg-black">
                       {thumb ? (
                         <img
@@ -144,25 +145,27 @@ export default function Story({ onPlay, onManage }: StoryProps) {
                           alt={titleText}
                           loading="lazy"
                           decoding="async"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-85 group-hover:opacity-100"
+                          className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105 group-hover:opacity-100"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#c4442a,#1a1a1a)]">
-                          <Youtube className="h-16 w-16 text-paper-soft/90" strokeWidth={1.4} />
+                        <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_35%,#334155,#0f172a)]">
+                          <Youtube className="h-16 w-16 text-slate-400" strokeWidth={1.4} />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
 
                       <span className="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/40 bg-sindoor/90 text-white shadow-xl transition-transform duration-300 group-hover:scale-110">
                         <Play className="ml-1 h-7 w-7 fill-white" />
                       </span>
                     </div>
 
-                    <div className="p-4 sm:p-5">
-                      <h3 className="font-editorial text-lg font-bold leading-snug text-paper-soft transition-colors group-hover:text-sindoor">
+                    <div className="p-5">
+                      {/* Crisp White Title */}
+                      <h3 className="font-editorial text-lg font-bold leading-snug text-white transition-colors group-hover:text-sindoor">
                         {titleText}
                       </h3>
-                      <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-paper-soft/70">
+                      {/* Light Silver Subtext */}
+                      <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-300">
                         <Moon className="h-3.5 w-3.5 text-sindoor" />
                         প্লেয়ারে শুনুন
                       </p>
@@ -173,10 +176,10 @@ export default function Story({ onPlay, onManage }: StoryProps) {
             })}
 
           {!loading && stories.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-paper-soft/20 bg-paper-soft/5 p-10 text-center">
-              <Moon className="h-12 w-12 text-paper-soft/40" />
-              <h3 className="mt-4 font-bangla text-lg font-bold text-paper-soft">রাত বিরেতে গল্প শোনার ঠিকানা</h3>
-              <p className="mt-1 font-bangla text-xs text-paper-soft/60">
+            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-600/50 bg-slate-900/80 p-10 text-center">
+              <Moon className="h-12 w-12 text-slate-400" />
+              <h3 className="mt-4 font-bangla text-lg font-bold text-white">রাত বিরেতে গল্প শোনার ঠিকানা</h3>
+              <p className="mt-1 font-bangla text-xs text-slate-400">
                 এখনও কোনো গল্প যোগ হয়নি — data.json ফাইলে "stories" অ্যারে যোগ করুন।
               </p>
             </div>
@@ -185,7 +188,7 @@ export default function Story({ onPlay, onManage }: StoryProps) {
           {onManage && (
             <button
               onClick={onManage}
-              className="group flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-[18px] border-[3px] border-dashed border-sindoor/45 bg-sindoor/10 text-sindoor transition-colors hover:bg-sindoor/20"
+              className="group flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-2xl border-[3px] border-dashed border-slate-500/50 bg-slate-900/60 text-slate-300 transition-colors hover:border-sindoor hover:bg-slate-900 hover:text-white"
             >
               <Plus className="h-9 w-9 transition-transform group-hover:rotate-90" />
               <span className="font-bangla text-base font-bold">নতুন গল্প যোগ করুন</span>
