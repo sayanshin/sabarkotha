@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown, Sparkles, Megaphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useData } from '../context/DataContext';
 
 interface HomeProps {
   onJoin: () => void;
@@ -158,7 +157,4 @@ export default function Home({ onJoin }: HomeProps) {
     </section>
   );
 }
-      </div>
-    </section>
-  );
-}
+
