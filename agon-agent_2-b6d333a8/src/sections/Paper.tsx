@@ -39,7 +39,8 @@ export default function Paper() {
             <span className="h-px flex-1 bg-ink/30" />
           </div>
           <p className="font-bangla text-sm leading-relaxed text-ink-soft sm:text-base">
-            প্রতিদিন সকালে ছাপা হয় — পাড়ার চায়ের দোকানের বেঞ্চে সাজানো খবরের সূত্রসমূহ
+            সম্পাদক সোনার কলম হাতে,
+প্রতিদিনের সত্যগুলো শব্দে সাজিয়ে চলেছেন...
           </p>
         </motion.header>
 
@@ -89,7 +90,10 @@ export default function Paper() {
 
           {!loading && papers.length === 0 && (
             <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
-              আজকের ছাপা এখনও প্রেসে যায়নি — একটু পরে আবার দেখুন।
+              সোনার কলম হাতে, লিখছি সত্য কথা,
+একটু অপেক্ষা করো, মিটুক রাতের ব্যথা।
+পাতায় পাতায় সাজছে আজ তোমারই সকাল,
+শেষ দাগটা পড়লেই—খুলবে খবরের জাল।
             </p>
           )}
         </div>
