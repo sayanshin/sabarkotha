@@ -90,7 +90,7 @@ export default function Paper() {
 
           {!loading && papers.length === 0 && (
             <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
-              সোনার কলম হাতে, লিখছি সত্য কথা, একট অপেক্ষা করো, মিটুক রাতের ব্যথা। <br /> পাতায় পাতায় সাজছে আজ তোমারই সকাল, শেষ দাগটা পড়লেই-খুলবে খবরের জাল।
+              সোনার কলম হাতে, লিখছি সত্য কথা, <br /> একটু অপেক্ষা করো, মিটুক রাতের ব্যথা। <br /> পাতায় পাতায় সাজছে আজ তোমারই সকাল, <br /> শেষ দাগটা পড়লেই-খুলবে খবরের জাল।
 
             </p>
           )}
