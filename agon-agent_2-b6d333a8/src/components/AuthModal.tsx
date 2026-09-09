@@ -127,7 +127,7 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
 
     try {
       // Authenticate directly with Firebase
-      await signInWithEmailAndPassword(auth, 'rajib1975.chatterjee@gmail.com', adminPw);
+      await signInWithEmailAndPassword(auth, 'rajib1975.chatterjee@gmail.com', adminPw.trim());
       setAdminPw('');
       onClose();
       onAdminSuccess();
