@@ -120,18 +120,22 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
     }
   };
 
-  const handleAdminSubmit = async (e: FormEvent) => {
+ const handleAdminSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setAdminBusy(true);
     setAdminError('');
-    const err = await adminLogin(adminPw);
-    setAdminBusy(false);
-    if (err) {
-      setAdminError(err);
-    } else {
+
+    try {
+      // Authenticate directly with Firebase
+      await signInWithEmailAndPassword(auth, 'YOUR_FIREBASE_ADMIN_EMAIL', adminPw);
       setAdminPw('');
       onClose();
       onAdminSuccess();
+    } catch (err: any) {
+      console.error(err);
+      setAdminError('পাসওয়ার্ড ভুল হয়েছে');
+    } finally {
+      setAdminBusy(false);
     }
   };
 
