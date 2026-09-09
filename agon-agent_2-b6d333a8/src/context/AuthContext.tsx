@@ -9,8 +9,15 @@ import {
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
+// Add authorized admin email list here
+const ADMIN_EMAILS = [
+  'rajib1975.chatterjee@gmail.com',
+  'sayanchatterjee.sonali@gmail.com'
+];
+
 interface AuthContextValue {
   user: User | null;
+  isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<string | null>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: string | null; autoSignedIn: boolean }>;
@@ -19,6 +26,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
+  isAdmin: false,
   loading: true,
   signIn: async () => null,
   signUp: async () => ({ error: null, autoSignedIn: false }),
@@ -29,11 +37,18 @@ const AuthContext = createContext<AuthContextValue>({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      // Automatically grant admin rights if logged-in email is in the list
+      if (currentUser?.email && ADMIN_EMAILS.includes(currentUser.email.toLowerCase())) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
 
@@ -63,10 +78,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await firebaseSignOut(auth);
+    setIsAdmin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
