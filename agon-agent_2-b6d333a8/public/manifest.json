@@ -1,1 +1,20 @@
-
+{
+  "short_name": "Sabar Kotha",
+  "name": "Sabar Kotha",
+  "icons": [
+    {
+      "src": "/assets/asset3.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/asset3.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "display": "standalone"
+}
