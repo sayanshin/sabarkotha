@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { api } from '../lib/api';
 import { signInWithGoogle } from '../lib/googleAuth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../lib/firebase';
 
 interface AuthModalProps {
   open: boolean;
