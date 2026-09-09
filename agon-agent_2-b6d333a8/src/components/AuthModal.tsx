@@ -419,6 +419,23 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
                     <br />
                     <span className="text-xs">Authorized editors only — the password is verified securely on the server.</span>
                   </p>
+                  <div className="mb-4">
+  <label htmlFor="admin-email" className="mb-1 block text-sm font-semibold text-ink">
+    অ্যাডমিন ইমেইল <span className="font-normal text-ink-soft">(Email)</span>
+  </label>
+  <div className="relative">
+    <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
+    <input
+      id="admin-email"
+      type="email"
+      required
+      value={adminEmail}
+      onChange={(e) => setAdminEmail(e.target.value)}
+      placeholder="admin@example.com"
+      className="field pl-10"
+    />
+  </div>
+</div>
                   <div>
                     <label htmlFor="admin-pw" className="mb-1 block text-sm font-semibold text-ink">
                       অ্যাডমিন পাসওয়ার্ড
