@@ -36,6 +36,8 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
   const [showPw, setShowPw] = useState(false);
 
   // admin flow state
+  // Add state alongside your existing adminPw state
+  const [adminEmail, setAdminEmail] = useState('');
   const [adminPw, setAdminPw] = useState('');
   const [adminBusy, setAdminBusy] = useState(false);
   const [adminError, setAdminError] = useState('');
@@ -127,8 +129,9 @@ export default function AuthModal({ open, onClose, onAdminSuccess }: AuthModalPr
 
     try {
       // Authenticate directly with Firebase
-      await signInWithEmailAndPassword(auth, 'rajib1975.chatterjee@gmail.com', adminPw.trim());
+      await signInWithEmailAndPassword(auth, adminEmail.trim(), adminPw.trim());
       setAdminPw('');
+      setAdminEmail(''); // <-- Add this line
       onClose();
       onAdminSuccess();
     } catch (err: any) {
