@@ -43,7 +43,7 @@ function App() {
               <AlponaDivider from="rgba(246,238,218,0)" to="rgba(246,238,218,0)" />
               <Updates onPlay={setPlaying} onManage={() => openAdmin('updates')} />
               <AlponaDivider from="rgba(246,238,218,0)" to="rgba(143,29,22,1)" />
-              <Live onManage={() => openAdmin('live')} />
+              <Live />
               <AlponaDivider from="rgba(143,29,22,0.85)" to="rgba(246,238,218,1)" />
               <Paper />
               <AlponaDivider from="rgba(246,238,218,0)" to="rgba(27,18,11,1)" />
