@@ -1,173 +1,60 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Radio, Tv } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
+import { api, type LiveBroadcast } from '../lib/api';
+import { ytEmbedUrl } from '../lib/youtube';
 
-export interface LiveStreamData {
-  is_live: boolean;
-  title: string;
-  youtube_url: string;
-}
+export default function Live() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
 
-interface LiveProps {
-  onPlay?: (video: {
-    id: number;
-    title: string;
-    youtube_url: string;
-    category: string;
-    featured: boolean;
-    sort_order: number;
-    created_at: string;
-  }) => void;
-  onManage?: () => void;
-}
-
-// Local helper to transform YouTube URLs to Embed URLs cleanly
-function getEmbedUrl(url: string): string | null {
-  if (!url) return null;
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|live\/)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return match && match[2].length === 11 ? `https://www.youtube.com/embed/${match[2]}` : null;
-}
-
-export default function Live({ onPlay }: LiveProps) {
-  const [stream, setStream] = useState<LiveStreamData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [liveData, setLiveData] = useState<LiveBroadcast | null>(null);
 
   useEffect(() => {
-    async function loadLiveStream() {
-      try {
-        const res = await fetch('/data.json');
-        const json = await res.json();
-        
-        if (json && json.live) {
-          setStream({
-            is_live: Boolean(json.live.isLive ?? json.live.is_live),
-            title: json.live.title || 'লাইভ সম্প্রচার',
-            youtube_url: json.live.youtube_url || json.live.youtubeUrl || '',
-          });
-        }
-      } catch (err) {
-        console.error('Error loading live stream data:', err);
-      } finally {
-        setLoading(false);
-      }
+    async function loadLive() {
+      const data = await api.live.get();
+      setLiveData(data);
     }
-    loadLiveStream();
+    loadLive();
   }, []);
 
-  const embedUrl = stream?.youtube_url ? getEmbedUrl(stream.youtube_url) : null;
+  const embed = liveData?.youtube_url ? ytEmbedUrl(liveData.youtube_url) : null;
 
   return (
-    <section id="live" className="relative min-h-[calc(100vh-5rem)] scroll-mt-24 overflow-hidden py-24">
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/assets/asset2.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover object-center filter brightness-90 contrast-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/60 to-paper/30" />
-      </div>
+    <section id="live" ref={ref} className="relative scroll-mt-24 overflow-hidden py-24 sm:py-32">
+      <motion.div style={{ y: bgY }} className="absolute inset-0" aria-hidden="true">
+        <img src="/assets/asset2.png" alt="" className="h-full w-full object-cover object-center" />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-paper to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper to-transparent" />
+      </motion.div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4">
-        <div className="paper-ribbon">
-          <SectionHeading
-            kicker="Live Streaming"
-            title="সরাসরি সম্প্রচার"
-            sub="কলকাতা ও জেলার খবর — মুহূর্তের খবর মুহূর্তে"
-          />
-        </div>
+      <div className="relative z-10 mx-auto max-w-5xl px-4">
+        <SectionHeading kicker="Live" title="সরাসরি সম্প্রচার" sub="সব সময়ের সেরা খবর, সরাসরি আপনার পর্দায়" />
 
-        <div className="mt-12 grid items-center gap-10 lg:grid-cols-12">
-          {/* Status Panel */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="lg:col-span-5"
-          >
-            <div className="inline-flex items-center gap-2 rounded-full border border-ink/15 bg-paper-soft/90 px-4 py-1.5 backdrop-blur-md">
-              <span className="relative flex h-3 w-3">
-                {stream?.is_live ? (
-                  <>
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sindoor opacity-75" />
-                    <span className="relative inline-flex h-3 w-3 rounded-full bg-sindoor" />
-                  </>
-                ) : (
-                  <span className="h-3 w-3 rounded-full bg-ink/40" />
-                )}
-              </span>
-              <span className="font-bangla text-xs font-bold tracking-wide text-ink">
-                {stream?.is_live ? 'সরাসরি সম্প্রচার চলছে' : 'অফলাইন'}
-              </span>
+        <div className="mt-12 overflow-hidden rounded-2xl border-4 border-sindoor/30 bg-ink shadow-2xl">
+          {liveData?.is_live && embed ? (
+            <div className="aspect-video w-full">
+              <iframe
+                src={`${embed}?autoplay=1`}
+                title={liveData.title || 'Live Stream'}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="h-full w-full border-0"
+              />
             </div>
-
-            <h2 className="font-editorial mt-6 text-3xl font-bold leading-tight text-ink sm:text-4xl">
-              {stream?.is_live ? stream.title : 'এখন সম্প্রচার বন্ধ'}
-            </h2>
-
-            <p className="mt-4 font-bangla text-sm leading-relaxed text-ink-soft sm:text-base">
-              {stream?.is_live
-                ? 'সরাসরি খবর ও সরাসরি আলোচনা দেখতে ডানপাশের ভিডিও উইন্ডোতে নজর রাখুন।'
-                : 'প্রতিদিন ভোরের সংবাদ সকাল ৭টায়, প্রধান সংবাদ সন্ধ্যা ৬টায়। লাইভ শুরু হলেই এই পাতায় সরাসরি দেখা যাবে।'}
-            </p>
-
-            {stream?.is_live && onPlay && (
-              <button
-                onClick={() =>
-                  onPlay({
-                    id: Date.now(),
-                    title: stream.title,
-                    youtube_url: stream.youtube_url,
-                    category: 'লাইভ',
-                    featured: true,
-                    sort_order: 0,
-                    created_at: new Date().toISOString(),
-                  })
-                }
-                className="mt-6 flex items-center gap-2 rounded-xl bg-sindoor px-6 py-3 font-bangla text-sm font-bold text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
-              >
-                <Tv className="h-4 w-4" />
-                ফুলস্ক্রিন প্লেয়ারে দেখুন
-              </button>
-            )}
-          </motion.div>
-
-          {/* Video / Placeholder Box */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="lg:col-span-7"
-          >
-            <div className="paper-card overflow-hidden p-2 shadow-2xl sm:p-3">
-              <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-ink">
-                {loading ? (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-sindoor border-t-transparent" />
-                  </div>
-                ) : stream?.is_live && embedUrl ? (
-                  <iframe
-                    src={`${embedUrl}?autoplay=1&mute=0`}
-                    title={stream.title}
-                    className="h-full w-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-paper-soft">
-                    <Radio className="h-16 w-16 animate-pulse text-paper-soft/40" />
-                    <h3 className="font-editorial mt-4 text-xl font-bold">পরবর্তী লাইভ শিডিউল শীঘ্রই</h3>
-                    <p className="mt-1 text-xs text-paper-soft/60">
-                      The broadcast room is quiet — the dhak will sound again soon.
-                    </p>
-                  </div>
-                )}
+          ) : (
+            <div className="flex min-h-[360px] flex-col items-center justify-center p-8 text-center text-paper-soft">
+              <div className="relative mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-sindoor/20 text-sindoor">
+                <Radio className="h-10 w-10 animate-pulse" />
               </div>
+              <h3 className="font-editorial text-2xl font-bold">{liveData?.title || 'এই মুহূর্তে কোনো লাইভ নেই'}</h3>
+              <p className="mt-2 text-sm text-paper-soft/70">
+                {liveData?.description || 'পরবর্তী সরাসরি সম্প্রচারের জন্য সাথে থাকুন।'}
+              </p>
             </div>
-          </motion.div>
+          )}
         </div>
       </div>
     </section>
