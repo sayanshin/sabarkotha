@@ -29,7 +29,7 @@ export default function Live() {
   return (
     <section id="live" ref={ref} className="relative scroll-mt-24 overflow-hidden py-24 sm:py-32">
       <motion.div style={{ y: bgY }} className="absolute inset-0" aria-hidden="true">
-        <img src="/assets/asset2.png" alt="" className="h-full w-full object-cover object-center" />
+        <img src="/assets/asset9.png" alt="" className="h-full w-full object-cover object-center" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-paper to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper to-transparent" />
       </motion.div>
