@@ -35,8 +35,10 @@ export default function Story({ onPlay }: StoryProps) {
           {loading && <p className="col-span-full text-center font-bangla text-ink-soft">লোড হচ্ছে...</p>}
 
           {!loading &&
-            episodes.map((item, i) => {
-              const thumb = ytThumb(item.youtube_url);
+            episodes.map((item: any, i) => {
+              const videoUrl = item.youtube_url || item.url || '';
+              const thumb = item.thumbnail_url || (videoUrl ? ytThumb(videoUrl) : '');
+              const desc = item.description || item.dscription || '';
 
               return (
                 <div
@@ -44,9 +46,9 @@ export default function Story({ onPlay }: StoryProps) {
                   className="paper-card cursor-pointer overflow-hidden p-0 transition-transform hover:-translate-y-1"
                   onClick={() =>
                     onPlay?.({
-                      id: item.id as any,
-                      title: item.title,
-                      youtube_url: item.youtube_url,
+                      id: (Number(item.id) || item.id) as any,
+                      title: item.title || 'বিশেষ গল্প',
+                      youtube_url: videoUrl,
                       category: 'গল্প',
                       featured: false,
                       sort_order: i,
@@ -69,7 +71,7 @@ export default function Story({ onPlay }: StoryProps) {
 
                   <div className="p-4">
                     <h3 className="font-editorial text-lg font-bold text-ink">{item.title}</h3>
-                    {item.description && <p className="mt-1 line-clamp-2 text-xs text-ink-soft">{item.description}</p>}
+                    {desc && <p className="mt-1 line-clamp-2 text-xs text-ink-soft">{desc}</p>}
                   </div>
                 </div>
               );
