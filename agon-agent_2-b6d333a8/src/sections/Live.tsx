@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Radio } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import { api, type LiveBroadcast } from '../lib/api';
-import { youtubeEmbedUrl } from '../lib/youtube';
+import { ytEmbedUrl } from '../lib/youtube'; // <--- Change youtubeEmbedUrl to ytEmbedUrl
 
 export default function Live() {
   const ref = useRef<HTMLElement>(null);
@@ -24,7 +24,7 @@ export default function Live() {
     loadLive();
   }, []);
 
-  const embed = liveData?.youtube_url ? youtubeEmbedUrl(liveData.youtube_url) : null;
+  const embed = liveData?.youtube_url ? ytEmbedUrl(liveData.youtube_url) : null;
 
   return (
     <section id="live" ref={ref} className="relative scroll-mt-24 overflow-hidden py-24 sm:py-32">
