@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Film, Play } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import { api, type StoryEpisode, type UpdateVideo } from '../lib/api';
@@ -9,6 +10,10 @@ interface StoryProps {
 }
 
 export default function Story({ onPlay }: StoryProps) {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
+
   const [episodes, setEpisodes] = useState<StoryEpisode[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,8 +32,20 @@ export default function Story({ onPlay }: StoryProps) {
   }, []);
 
   return (
-    <section id="story" className="relative scroll-mt-24 py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4">
+    <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden py-24 sm:py-32">
+      {/* Background Image Container */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0" aria-hidden="true">
+        <img
+          src="/06-Story-Haunted-Village.png"
+          alt=""
+          className="h-full w-full object-cover object-center opacity-40"
+        />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-paper to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper to-transparent" />
+      </motion.div>
+
+      {/* Content Container */}
+      <div className="relative z-10 mx-auto max-w-6xl px-4">
         <SectionHeading kicker="Story" title="বিশেষ গল্প ও পর্ব" sub="দৈনন্দিন খবরের পেছনের আসল ঘটনা" />
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
