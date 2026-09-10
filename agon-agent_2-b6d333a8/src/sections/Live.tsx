@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Radio, Tv } from 'lucide-react';
+import { Radio } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import { api, type LiveBroadcast } from '../lib/api';
-import { ytEmbedUrl } from '../lib/youtube';
+import { youtubeEmbedUrl } from '../lib/youtube';
 
 export default function Live() {
   const ref = useRef<HTMLElement>(null);
@@ -14,13 +14,17 @@ export default function Live() {
 
   useEffect(() => {
     async function loadLive() {
-      const data = await api.live.get();
-      setLiveData(data);
+      try {
+        const data = await api.live.get();
+        setLiveData(data);
+      } catch (err) {
+        console.error('Error loading live data:', err);
+      }
     }
     loadLive();
   }, []);
 
-  const embed = liveData?.youtube_url ? ytEmbedUrl(liveData.youtube_url) : null;
+  const embed = liveData?.youtube_url ? youtubeEmbedUrl(liveData.youtube_url) : null;
 
   return (
     <section id="live" ref={ref} className="relative scroll-mt-24 overflow-hidden py-24 sm:py-32">
