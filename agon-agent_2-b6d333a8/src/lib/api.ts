@@ -1,3 +1,15 @@
+import { 
+  collection, 
+  getDocs, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  query, 
+  orderBy 
+} from 'firebase/firestore';
+import { db } from './firebase';
+
 export interface NewsItem {
   id: number;
   created_at?: string;
@@ -123,80 +135,200 @@ export const api = {
 
   updates: {
     list: async (): Promise<UpdateVideo[]> => {
-      const json = await fetchStaticJson();
-      if (!json) return [];
-      const list = Array.isArray(json) ? json : json.updates || [];
-      return list.map((item: any, i: number) => ({
-        id: item.id || i + 1,
-        title: item.dscription || item.title || 'সংবাদ আপডেট',
-        youtube_url: item.news_url || item.youtube_url || '',
-        category: 'সংবাদ',
-        featured: false,
-        sort_order: i,
-        created_at: item.created_at || new Date().toISOString(),
-      }));
+      try {
+        const querySnapshot = await getDocs(collection(db, 'updates'));
+        return querySnapshot.docs.map((docSnap, i) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id as any,
+            title: data.title || data.dscription || 'সংবাদ আপডেট',
+            youtube_url: data.youtube_url || data.news_url || '',
+            category: data.category || 'সংবাদ',
+            featured: Boolean(data.featured),
+            sort_order: data.sort_order ?? i,
+            created_at: data.created_at || new Date().toISOString(),
+          };
+        });
+      } catch (error) {
+        console.error('Error fetching updates from Firestore:', error);
+        return [];
+      }
     },
-    create: async (d: VideoPayload) => ({} as UpdateVideo),
-    update: async (id: number, d: VideoPayload) => ({} as UpdateVideo),
-    remove: async (id: number) => ({ ok: true }),
+    create: async (d: VideoPayload) => {
+      const docRef = await addDoc(collection(db, 'updates'), {
+        ...d,
+        created_at: new Date().toISOString(),
+      });
+      return { id: docRef.id, ...d } as unknown as UpdateVideo;
+    },
+    update: async (id: number | string, d: VideoPayload) => {
+      const docRef = doc(db, 'updates', String(id));
+      await updateDoc(docRef, d);
+      return { id, ...d } as unknown as UpdateVideo;
+    },
+    remove: async (id: number | string) => {
+      await deleteDoc(doc(db, 'updates', String(id)));
+      return { ok: true };
+    },
   },
 
-  live: {
+ live: {
     get: async (): Promise<LiveBroadcast | null> => {
-      const json = await fetchStaticJson();
-      if (!json || !json.live) return null;
-      return {
-        id: 1,
-        title: json.live.title || '',
-        description: '',
-        youtube_url: json.live.youtube_url || '',
-        is_live: Boolean(json.live.isLive),
-        updated_at: new Date().toISOString(),
-      };
+      try {
+        const querySnapshot = await getDocs(collection(db, 'live'));
+        if (querySnapshot.empty) return null;
+        const docSnap = querySnapshot.docs[0];
+        const data = docSnap.data();
+        return {
+          id: docSnap.id as any,
+          title: data.title || '',
+          description: data.description || '',
+          youtube_url: data.youtube_url || '',
+          is_live: Boolean(data.is_live),
+          updated_at: data.updated_at || new Date().toISOString(),
+        };
+      } catch (error) {
+        console.error('Error fetching live settings:', error);
+        return null;
+      }
     },
-    save: async (d: Partial<LiveBroadcast>) => ({} as LiveBroadcast),
+    save: async (d: Partial<LiveBroadcast>) => {
+      const querySnapshot = await getDocs(collection(db, 'live'));
+      if (!querySnapshot.empty) {
+        const firstDoc = querySnapshot.docs[0];
+        await updateDoc(doc(db, 'live', firstDoc.id), {
+          ...d,
+          updated_at: new Date().toISOString(),
+        });
+        return { id: firstDoc.id, ...d } as unknown as LiveBroadcast;
+      } else {
+        const docRef = await addDoc(collection(db, 'live'), {
+          ...d,
+          updated_at: new Date().toISOString(),
+        });
+        return { id: docRef.id, ...d } as unknown as LiveBroadcast;
+      }
+    },
   },
 
   papers: {
-    list: async (): Promise<PaperLink[]> => [],
-    create: async (d: PaperPayload) => ({} as PaperLink),
-    update: async (id: number, d: PaperPayload) => ({} as PaperLink),
-    remove: async (id: number) => ({ ok: true }),
+    list: async (): Promise<PaperLink[]> => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'papers'));
+        return querySnapshot.docs.map((docSnap) => ({
+          id: docSnap.id as any,
+          ...(docSnap.data() as Omit<PaperLink, 'id'>),
+        }));
+      } catch (error) {
+        console.error('Error fetching papers:', error);
+        return [];
+      }
+    },
+    create: async (d: PaperPayload) => {
+      const docRef = await addDoc(collection(db, 'papers'), {
+        ...d,
+        created_at: new Date().toISOString(),
+      });
+      return { id: docRef.id, ...d } as unknown as PaperLink;
+    },
+    update: async (id: number | string, d: PaperPayload) => {
+      await updateDoc(doc(db, 'papers', String(id)), d);
+      return { id, ...d } as unknown as PaperLink;
+    },
+    remove: async (id: number | string) => {
+      await deleteDoc(doc(db, 'papers', String(id)));
+      return { ok: true };
+    },
   },
 
   episodes: {
     list: async (): Promise<StoryEpisode[]> => {
-      const json = await fetchStaticJson();
-      if (!json || !Array.isArray(json.story)) return [];
-      return json.story.map((item: any, i: number) => ({
-        id: item.id || i + 1,
-        title: item.title || '',
-        description: item.description || '',
-        youtube_url: item.youtube_url || '',
-        duration: '',
-        sort_order: i,
-        created_at: new Date().toISOString(),
-      }));
+      try {
+        const querySnapshot = await getDocs(collection(db, 'episodes'));
+        return querySnapshot.docs.map((docSnap, i) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id as any,
+            title: data.title || '',
+            description: data.description || '',
+            youtube_url: data.youtube_url || '',
+            duration: data.duration || '',
+            sort_order: data.sort_order ?? i,
+            created_at: data.created_at || new Date().toISOString(),
+          };
+        });
+      } catch (error) {
+        console.error('Error fetching story episodes:', error);
+        return [];
+      }
     },
-    create: async (d: EpisodePayload) => ({} as StoryEpisode),
-    update: async (id: number, d: EpisodePayload) => ({} as StoryEpisode),
-    remove: async (id: number) => ({ ok: true }),
+    create: async (d: EpisodePayload) => {
+      const docRef = await addDoc(collection(db, 'episodes'), {
+        ...d,
+        created_at: new Date().toISOString(),
+      });
+      return { id: docRef.id, ...d } as unknown as StoryEpisode;
+    },
+    update: async (id: number | string, d: EpisodePayload) => {
+      await updateDoc(doc(db, 'episodes', String(id)), d);
+      return { id, ...d } as unknown as StoryEpisode;
+    },
+    remove: async (id: number | string) => {
+      await deleteDoc(doc(db, 'episodes', String(id)));
+      return { ok: true };
+    },
   },
 
   links: {
-    list: async (): Promise<SiteLink[]> => [],
-    create: async (d: LinkPayload) => ({} as SiteLink),
-    update: async (id: number, d: LinkPayload) => ({} as SiteLink),
-    remove: async (id: number) => ({ ok: true }),
+    list: async (): Promise<SiteLink[]> => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'links'));
+        return querySnapshot.docs.map((docSnap) => ({
+          id: docSnap.id as any,
+          ...(docSnap.data() as Omit<SiteLink, 'id'>),
+        }));
+      } catch (error) {
+        console.error('Error fetching links:', error);
+        return [];
+      }
+    },
+    create: async (d: LinkPayload) => {
+      const docRef = await addDoc(collection(db, 'links'), d);
+      return { id: docRef.id, ...d } as unknown as SiteLink;
+    },
+    update: async (id: number | string, d: LinkPayload) => {
+      await updateDoc(doc(db, 'links', String(id)), d);
+      return { id, ...d } as unknown as SiteLink;
+    },
+    remove: async (id: number | string) => {
+      await deleteDoc(doc(db, 'links', String(id)));
+      return { ok: true };
+    },
   },
 
   members: {
-    list: async (): Promise<JourneyMember[]> => [],
-    join: async (d: { name: string; email?: string; message?: string }) => ({} as JourneyMember),
+    list: async (): Promise<JourneyMember[]> => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'members'));
+        return querySnapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...(docSnap.data() as Omit<JourneyMember, 'id'>),
+        }));
+      } catch (error) {
+        console.error('Error fetching members:', error);
+        return [];
+      }
+    },
+    join: async (d: { name: string; email?: string; message?: string }) => {
+      const docRef = await addDoc(collection(db, 'members'), {
+        ...d,
+        created_at: new Date().toISOString(),
+      });
+      return { id: docRef.id, ...d } as JourneyMember;
+    },
   },
 
   admin: {
     login: async (password: string) => ({ token: 'static_admin_token' }),
     verify: async () => ({ valid: true }),
   },
-};
