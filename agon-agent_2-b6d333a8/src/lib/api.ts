@@ -328,7 +328,8 @@ export const api = {
     },
   },
 
-  admin: {
+ admin: {
     login: async (password: string) => ({ token: 'static_admin_token' }),
     verify: async () => ({ valid: true }),
   },
+};
