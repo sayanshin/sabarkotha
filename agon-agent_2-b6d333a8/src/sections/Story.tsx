@@ -69,7 +69,7 @@ export default function Story({ onPlay }: StoryProps) {
               return (
                 <div
                   key={item.id || i}
-                  className="paper-card cursor-pointer overflow-hidden p-0 shadow-2xl transition-transform hover:-translate-y-1"
+                  className="group cursor-pointer overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/85 backdrop-blur-md shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:border-red-900/60 hover:shadow-red-950/40"
                   onClick={() =>
                     onPlay?.({
                       id: (Number(item.id) || item.id) as any,
@@ -82,22 +82,29 @@ export default function Story({ onPlay }: StoryProps) {
                     })
                   }
                 >
-                  <div className="relative aspect-video bg-ink">
+                  <div className="relative aspect-video bg-black overflow-hidden">
                     {thumb ? (
-                      <img src={thumb} alt={item.title} className="h-full w-full object-cover" />
+                      <img 
+                        src={thumb} 
+                        alt={item.title} 
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-paper-soft">
+                      <div className="flex h-full w-full items-center justify-center text-zinc-600">
                         <Film className="h-12 w-12" />
                       </div>
                     )}
-                    <span className="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-full bg-sindoor/90 text-white shadow-lg">
+                    <span className="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-700/90 text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
                       <Play className="ml-1 h-6 w-6 fill-white" />
                     </span>
                   </div>
 
-                  <div className="p-4">
-                    <h3 className="font-editorial text-lg font-bold text-ink">{item.title}</h3>
-                    {desc && <p className="mt-1 line-clamp-2 text-xs text-ink-soft">{desc}</p>}
+                  {/* Dark Bottom Section for Horror Aesthetic & High Text Contrast */}
+                  <div className="p-4 bg-zinc-900/90 border-t border-zinc-800/80">
+                    <h3 className="font-editorial text-lg font-bold text-zinc-100 group-hover:text-red-400 transition-colors">
+                      {item.title}
+                    </h3>
+                    {desc && <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{desc}</p>}
                   </div>
                 </div>
               );
