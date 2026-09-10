@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ExternalLink, Play, Plus, Youtube } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import { useAdmin } from '../context/AdminContext';
-import { type UpdateVideo } from '../lib/api';
+import { api, type UpdateVideo } from '../lib/api';
 import { ytThumb, youtubeId } from '../lib/youtube';
 
 interface NewsItem {
@@ -35,18 +35,11 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
   useEffect(() => {
     async function loadNews() {
       try {
-        const res = await fetch('/data.json');
-        const json = await res.json();
-        
-        // Handle both Object format {"updates": [...]} and Array format safely
-        const rawList: NewsItem[] = Array.isArray(json) 
-          ? json 
-          : (json.updates || json.news || []);
-
-        const filtered = rawList.filter((item) => item.news_url || item.youtube_url || item.url);
+        const rawList = await api.updates.list();
+        const filtered = rawList.filter((item) => item.youtube_url);
         setNews(filtered);
       } catch (err) {
-        console.error('Error loading static JSON news:', err);
+        console.error('Error loading news updates from Firebase:', err);
       } finally {
         setLoading(false);
       }
@@ -73,8 +66,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
           <SectionHeading
             kicker="Updates"
             title="আজকের বড় খবর"
-           sub={`দিন বদলায়, খবর আসে, বদলায় সময়ের রং,\nনতুন দিনের নতুন কথায় দেখুন তাদের ঢং।\nদেশের খবর, দেশের কথা, থাকুক সবার ঘরে,\nসবার কথা, প্রতিদিন–আপন করে ধরে।`}
-
+            sub={`দিন বদলায়, খবর আসে, বদলায় সময়ের রং,\nনতুন দিনের নতুন কথায় দেখুন তাদের ঢং।\nদেশের খবর, দেশের কথা, থাকুক সবার ঘরে,\nসবার কথা, প্রতিদিন–আপন করে ধরে।`}
           />
         </div>
 
@@ -166,7 +158,7 @@ export default function Updates({ onPlay, onManage }: UpdatesProps) {
 
           {!loading && news.length === 0 && (
             <p className="col-span-full rounded-2xl border-2 border-dashed border-ink/20 bg-paper-soft/80 px-6 py-10 text-center font-bangla text-ink-soft">
-              এখনও কোনো খবর আপডেট যোগ হয়নি — data.json ফাইলটি চেক করুন।
+              এখনও কোনো খবর আপডেট যোগ হয়নি — অ্যাডমিন প্যানেল থেকে নতুন খবর যোগ করুন।
             </p>
           )}
 
