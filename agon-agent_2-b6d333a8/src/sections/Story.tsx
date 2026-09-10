@@ -33,24 +33,32 @@ export default function Story({ onPlay }: StoryProps) {
 
   return (
     <section id="story" ref={ref} className="relative scroll-mt-24 overflow-hidden py-24 sm:py-32">
-      {/* Background Image Container - Clear & Fully Visible */}
+      {/* Background Image - Fully Sharp & Visible */}
       <motion.div style={{ y: bgY }} className="absolute inset-0" aria-hidden="true">
         <img
           src="/06-Story-Haunted-Village.png"
           alt=""
           className="h-full w-full object-cover object-center"
         />
-        {/* Very subtle edge fades so section borders transition smoothly */}
+        {/* Subtle top/bottom edge gradients for smooth section transitions */}
         <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-paper to-transparent opacity-80" />
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-paper to-transparent opacity-80" />
       </motion.div>
 
       {/* Content Container */}
       <div className="relative z-10 mx-auto max-w-6xl px-4">
-        <SectionHeading kicker="Story" title="বিশেষ গল্প ও পর্ব" sub="দৈনন্দিন খবরের পেছনের আসল ঘটনা" />
+        {/* Text Header with Contrast Backplate & Shadow */}
+        <div className="relative mx-auto max-w-2xl text-center">
+          {/* Subtle radial haze behind text to keep artwork fully visible around it */}
+          <div className="absolute inset-0 -z-10 rounded-full bg-black/40 blur-2xl" />
+          
+          <div className="[&_h2]:!text-amber-50 [&_h2]:drop-shadow-[0_4px_12px_rgba(0,0,0,0.95)] [&_p]:!text-zinc-200 [&_p]:drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] [&_span]:!text-red-500 [&_span]:drop-shadow-[0_0_8px_rgba(220,38,38,0.8)]">
+            <SectionHeading kicker="Story" title="বিশেষ গল্প ও পর্ব" sub="দৈনন্দিন খবরের পেছনের আসল ঘটনা" />
+          </div>
+        </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {loading && <p className="col-span-full text-center font-bangla text-ink-soft">লোড হচ্ছে...</p>}
+          {loading && <p className="col-span-full text-center font-bangla text-amber-100 drop-shadow">লোড হচ্ছে...</p>}
 
           {!loading &&
             episodes.map((item: any, i) => {
@@ -61,7 +69,7 @@ export default function Story({ onPlay }: StoryProps) {
               return (
                 <div
                   key={item.id || i}
-                  className="paper-card cursor-pointer overflow-hidden p-0 transition-transform hover:-translate-y-1"
+                  className="paper-card cursor-pointer overflow-hidden p-0 shadow-2xl transition-transform hover:-translate-y-1"
                   onClick={() =>
                     onPlay?.({
                       id: (Number(item.id) || item.id) as any,
@@ -96,7 +104,7 @@ export default function Story({ onPlay }: StoryProps) {
             })}
 
           {!loading && episodes.length === 0 && (
-            <p className="col-span-full text-center font-bangla text-ink-soft">
+            <p className="col-span-full text-center font-bangla text-amber-100 drop-shadow">
               কোনো গল্প যোগ করা হয়নি। অ্যাডমিন প্যানেল থেকে নতুন পর্ব যোগ করুন।
             </p>
           )}
