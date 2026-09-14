@@ -35,11 +35,11 @@ export default function Live() {
     loadData();
   }, []);
 
-  // Build seamless looping YouTube playlist URL
+  // Build seamless looping YouTube playlist URL with mute=1 for autoplay compliance
   const playlistParam = playlist.join(',');
   const firstVideo = playlist[0] || '';
   const embedUrl = playlist.length > 0 
-    ? `https://www.youtube.com/embed/${firstVideo}?playlist=${playlistParam}&autoplay=1&loop=1&enablejsapi=1`
+    ? `https://www.youtube.com/embed/${firstVideo}?playlist=${playlistParam}&autoplay=1&mute=1&loop=1&enablejsapi=1`
     : null;
 
   return (
